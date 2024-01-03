@@ -76,6 +76,9 @@ devDependencies:
   encoding:
     specifier: ^0.1.13
     version: 0.1.13
+  git-format-staged:
+    specifier: ^3.0.0
+    version: 3.0.0
   husky:
     specifier: ^8.0.3
     version: 8.0.3
@@ -995,6 +998,11 @@ packages:
   /get-stream@6.0.1:
     resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
     engines: {node: '>=10'}
+    dev: true
+
+  /git-format-staged@3.0.0:
+    resolution: {integrity: sha512-cdDJxV06qY8ucBsW/uIFR4PYN/kDHl43nG8yg+VPPaDeLAf8hEPhEIJTeJ+yRClxcDSpoTmDPiFZUoxFx1wPCg==}
+    hasBin: true
     dev: true
 
   /glob-parent@5.1.2:
