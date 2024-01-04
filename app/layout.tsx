@@ -1,6 +1,6 @@
 import "./globals.css"
 
-
+import { Navbar } from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import SupabaseProvider from "@/app/supabase-provider"
 
@@ -22,6 +22,7 @@ export default function RootLayout({
                 <SupabaseProvider>
                     <ThemeProvider attribute="class" defaultTheme="dark">
                         <div className="relative flex min-h-screen flex-col">
+                            <Navbar />
                             <div className="flex my-10 md:mt-10 md:mb-20 items-center justify-center">
                                 {children}
                             </div>
