@@ -1,8 +1,14 @@
 import "./globals.css"
 
+import { Lora } from "next/font/google"
+
 import { Navbar } from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import SupabaseProvider from "@/app/supabase-provider"
+
+const lora = Lora({
+    subsets: ["latin"],
+})
 
 export const metadata = {
     title: "Doro",
@@ -17,13 +23,13 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en">
+        <html lang="en" className={lora.className}>
             <body>
                 <SupabaseProvider>
-                    <ThemeProvider attribute="class" defaultTheme="dark">
+                    <ThemeProvider attribute="class" defaultTheme="light">
                         <div className="relative flex min-h-screen flex-col">
                             <Navbar />
-                            <div className="flex my-10 md:mt-10 md:mb-20 items-center justify-center">
+                            <div className="flex container my-10 md:mt-10 md:mb-20">
                                 {children}
                             </div>
                         </div>
