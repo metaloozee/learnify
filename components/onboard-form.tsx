@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
-import { BookText, Presentation } from "lucide-react"
+import { BookText, Presentation, RotateCw } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -20,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/components/ui/use-toast"
+import { useSupabase } from "@/app/supabase-provider"
 
 const onboardFormSchema = z.object({
     username: z.string().min(3).max(20),
@@ -30,7 +33,11 @@ const onboardFormSchema = z.object({
 })
 
 export const OnboardForm = ({ session }: { session: Session }) => {
+    const router = useRouter()
     const { toast } = useToast()
+    const { supabase } = useSupabase()
+
+    const [loading, setLoading] = useState(false)
 
     const form = useForm<z.infer<typeof onboardFormSchema>>({
         resolver: zodResolver(onboardFormSchema),
@@ -40,11 +47,54 @@ export const OnboardForm = ({ session }: { session: Session }) => {
         },
     })
 
-    const onSubmit = (values: z.infer<typeof onboardFormSchema>) => {
-        return toast({
-            title: "SUIIII",
-            description: `${values.username} ${values.first_name} ${values.last_name} ${values.type}`,
-        })
+    const onSubmit = async (values: z.infer<typeof onboardFormSchema>) => {
+        try {
+            setLoading(true)
+
+            const { data: existingUsername, error: existingUsernameError } =
+                await supabase
+                    .from("users")
+                    .select("*")
+                    .eq("username", values.username)
+                    .maybeSingle()
+
+            if (existingUsername) {
+                throw new Error(
+                    "There alreasy exists a user with that username."
+                )
+            }
+            if (existingUsernameError) {
+                throw new Error(existingUsernameError.message)
+            }
+
+            const { error: userError } = await supabase.from("users").insert({
+                userid: session.user.id,
+                username: values.username,
+                usertype: values.type,
+                first_name: values.first_name,
+                last_name: values.last_name,
+            })
+            if (userError) {
+                throw new Error(userError.message)
+            }
+
+            return toast({
+                title: "Hooray!!",
+                description: "You have successfully registered yourself!",
+            })
+        } catch (e: any) {
+            console.error(e)
+
+            return toast({
+                title: "Uh Oh",
+                description: e.message,
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+            form.reset()
+            router.push("/")
+        }
     }
 
     return (
@@ -63,7 +113,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                     </FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="username"
+                                            placeholder="Username"
                                             {...field}
                                         />
                                     </FormControl>
@@ -194,7 +244,14 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit">Submit</Button>
+                        {loading ? (
+                            <Button disabled type="submit">
+                                <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                                Please Wait
+                            </Button>
+                        ) : (
+                            <Button type="submit">Submit</Button>
+                        )}
                     </div>
                 </form>
             </Form>
