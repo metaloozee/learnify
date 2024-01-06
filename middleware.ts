@@ -21,6 +21,14 @@ export async function middleware(req: NextRequest) {
         if (!userData || userError) {
             return NextResponse.redirect(new URL("/onboarding", req.url))
         }
+
+        if (userData.usertype === "student") {
+            return NextResponse.redirect(new URL("/student", req.url))
+        }
+
+        if (userData.usertype === "teacher") {
+            return NextResponse.redirect(new URL("/teacher", req.url))
+        }
     }
 
     return NextResponse.next()
@@ -35,6 +43,6 @@ export const config = {
          * - favicon.ico (favicon file)
          * Feel free to modify this pattern to include more paths.
          */
-        "/((?!_next/static|_next/image|favicon.ico|onboarding).*)",
+        "/((?!_next/static|_next/image|favicon.ico|onboarding|student|teacher).*)",
     ],
 }

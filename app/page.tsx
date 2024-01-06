@@ -1,26 +1,10 @@
 import Link from "next/link"
-import {
-    ListTodo,
-    MoveRight,
-    ScrollText,
-    Users,
-    WalletCards,
-} from "lucide-react"
+import { ListTodo, ScrollText, WalletCards } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { createServerSupabaseClient } from "@/app/supabase-server"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export default async function Index() {
-    const supabase = await createServerSupabaseClient()
-
     return (
         <div className="mt-20 flex flex-col gap-5 justify-center items-center">
             <h1 className="text-3xl md:text-4xl">
