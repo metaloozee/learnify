@@ -1,5 +1,11 @@
 import Link from "next/link"
-import { MoveRight, Users } from "lucide-react"
+import {
+    ListTodo,
+    MoveRight,
+    ScrollText,
+    Users,
+    WalletCards,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +22,7 @@ export default async function Index() {
     const supabase = await createServerSupabaseClient()
 
     return (
-        <div className="mt-20 flex flex-col gap-5">
+        <div className="mt-20 flex flex-col gap-5 justify-center items-center">
             <h1 className="text-3xl md:text-4xl">
                 Discover Tailored Learning Experiences
             </h1>
@@ -27,49 +33,48 @@ export default async function Index() {
             </p>
 
             <Button asChild className="max-w-fit">
-                <Link href={"/"}>
-                    Get Started <MoveRight className="ml-2 h-5 w-5" />
-                </Link>
+                <Link href={"/"}>Get Started</Link>
             </Button>
 
-            <div className="mt-12 grid grid-cols-3 gap-5">
+            <div className="mt-8 grid grid-cols-3 gap-10">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Active Students
-                        </CardTitle>
-                        <Users className="w-3 h-3" />
+                        <WalletCards className="w-3 h-3" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">450,000+</div>
+                        <div className="text-2xl font-bold">Flash Cards</div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                            +20.1% from last month
+                            Master concepts effortlessly with AI-driven
+                            flashcards, adapting to your unique learning style.
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Notes Generated
-                        </CardTitle>
+                        <ScrollText className="w-3 h-3" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">4,500,000+</div>
+                        <div className="text-2xl font-bold">
+                            Personalized Notes
+                        </div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                            +20.1% from last month
+                            Explore personalized notes, where AI transforms your
+                            course content into a tailored learning experience.
                         </p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Total Students
-                        </CardTitle>
+                        <ListTodo className="w-3 h-3" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">450,000+</div>
+                        <div className="text-2xl font-bold">
+                            Personalized Mini Quiz
+                        </div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                            +20.1% from last month
+                            Challenge your knowledge with AI-enhanced mini
+                            quizzes, providing personalized assessments for
+                            effective learning.
                         </p>
                     </CardContent>
                 </Card>
