@@ -101,7 +101,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
         <div className="container border rounded-xl p-10">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="grid grid-cols-2 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
                         <FormField
                             control={form.control}
                             name="username"
@@ -140,7 +140,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                     <h1 className="mt-8 text-sm font-medium">
                         Tell us more about yourself
                     </h1>
-                    <div className="grid grid-cols-2 gap-10">
+                    <div className="grid grid-cols-2 gap-2 md:gap-10">
                         <FormField
                             control={form.control}
                             name="first_name"
@@ -176,9 +176,9 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                     </div>
 
                     <h1 className="mt-8 text-sm font-medium">
-                        Your position or responsibility here is
+                        Your position or responsibility here is?
                     </h1>
-                    <div className="grid grid-cols-1 gap-10">
+                    <div>
                         <FormField
                             control={form.control}
                             name="type"
@@ -188,7 +188,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                         <RadioGroup
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
-                                            className="mt-1 grid grid-cols-2 gap-10"
+                                            className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-10"
                                         >
                                             <FormItem>
                                                 <FormControl>
@@ -200,7 +200,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                                 </FormControl>
                                                 <FormLabel
                                                     htmlFor="student"
-                                                    className="w-full flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-2 hover:border-muted-foreground/50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                                    className="transition-all duration-200 w-full flex rounded-md border-2 border-muted hover:border-muted-foreground/50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                                 >
                                                     <Card className="w-full border-none shadow-none">
                                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -214,7 +214,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                                     </Card>
                                                 </FormLabel>
                                             </FormItem>
-                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                            <FormItem>
                                                 <FormControl>
                                                     <RadioGroupItem
                                                         value="teacher"
@@ -224,7 +224,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                                 </FormControl>
                                                 <FormLabel
                                                     htmlFor="teacher"
-                                                    className="w-full flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-2 hover:border-muted-foreground/50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                                    className="transition-all duration-200 w-full flex rounded-md border-2 border-muted hover:border-muted-foreground/50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                                 >
                                                     <Card className="w-full border-none shadow-none">
                                                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -244,13 +244,17 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                                 </FormItem>
                             )}
                         />
+                    </div>
+                    <div className="w-full mt-10">
                         {loading ? (
-                            <Button disabled type="submit">
+                            <Button className="w-full" disabled type="submit">
                                 <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                 Please Wait
                             </Button>
                         ) : (
-                            <Button type="submit">Submit</Button>
+                            <Button className="w-full" type="submit">
+                                Submit
+                            </Button>
                         )}
                     </div>
                 </form>

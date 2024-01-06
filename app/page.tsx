@@ -20,7 +20,7 @@ export default async function Index() {
                 <Link href={"/"}>Get Started</Link>
             </Button> */}
 
-            <div className="mt-8 grid grid-cols-3 gap-10">
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <WalletCards className="w-3 h-3" />
