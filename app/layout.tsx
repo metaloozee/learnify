@@ -2,6 +2,7 @@ import "./globals.css"
 
 import { Lora } from "next/font/google"
 
+import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import SupabaseProvider from "@/app/supabase-provider"
@@ -32,6 +33,7 @@ export default function RootLayout({
                             <div className="flex container my-10 md:mt-10 md:mb-20">
                                 {children}
                             </div>
+                            <Toaster />
                         </div>
                     </ThemeProvider>
                 </SupabaseProvider>
