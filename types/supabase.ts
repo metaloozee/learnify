@@ -133,16 +133,27 @@ export interface Database {
                 Row: {
                     subjectid: string
                     subjectname: string
+                    teacherid: string | null
                 }
                 Insert: {
                     subjectid?: string
                     subjectname: string
+                    teacherid?: string | null
                 }
                 Update: {
                     subjectid?: string
                     subjectname?: string
+                    teacherid?: string | null
                 }
-                Relationships: []
+                Relationships: [
+                    {
+                        foreignKeyName: "subjects_teacherid_fkey"
+                        columns: ["teacherid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
+                    },
+                ]
             }
             users: {
                 Row: {
