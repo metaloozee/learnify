@@ -16,9 +16,9 @@ export default async function Index() {
                 the way we teach and learn.
             </p>
 
-            <Button asChild className="max-w-fit">
+            {/* <Button asChild className="max-w-fit">
                 <Link href={"/"}>Get Started</Link>
-            </Button>
+            </Button> */}
 
             <div className="mt-8 grid grid-cols-3 gap-10">
                 <Card>
