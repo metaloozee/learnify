@@ -33,7 +33,7 @@ export default async function StudentIndexPage() {
                 your exploration.
             </p>
 
-            <Button className="max-w-fit" asChild>
+            <Button variant={"secondary"} className="max-w-fit" asChild>
                 <Link href={"/subjects"}>
                     Explore Subjects <MoveUpRight className="ml-2 h-3 w-3" />
                 </Link>
