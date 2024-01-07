@@ -1,7 +1,75 @@
 import Link from "next/link"
+import type { Session } from "@supabase/supabase-js"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
+
+export type SubjectData = {
+    description: string | null
+    subjectid: string
+    subjectname: string
+    teacherid: string | null
+    users: {
+        first_name: string | null
+        last_name: string | null
+        subjects: string[] | null
+        userid: string
+        username: string
+        usertype: string
+    } | null
+}
+export const ExploreSubjectsCard = async ({
+    subject,
+    session,
+}: {
+    subject: SubjectData
+    session: Session | null
+}) => {
+    const supabase = await createServerSupabaseClient()
+    const { data: UserData } = await supabase
+        .from("users")
+        .select("subjects")
+        .eq("userid", session?.user.id ?? "")
+        .single()
+
+    return (
+        <Card className="flex flex-col justify-between">
+            <div>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <Badge className="max-w-fit" variant={"outline"}>
+                        {subject?.users?.first_name} {subject?.users?.last_name}
+                    </Badge>
+                </CardHeader>
+                <CardContent>
+                    <h1 className="mt-2 text-2xl font-bold">
+                        {subject?.subjectname}
+                    </h1>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        {subject?.description}
+                    </p>
+                </CardContent>
+            </div>
+            <CardFooter>
+                {UserData?.subjects?.includes(subject.subjectid) ? (
+                    <Button className="w-full" disabled>
+                        Already Enrolled
+                    </Button>
+                ) : (
+                    <Button className="w-full">Enroll</Button>
+                )}
+            </CardFooter>
+        </Card>
+    )
+}
 
 export const StudentSubjectCard = async ({
     subjectid,

@@ -1,3 +1,7 @@
+import Link from "next/link"
+import { MoveUpRight } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import { StudentSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
@@ -28,6 +32,12 @@ export default async function StudentIndexPage() {
                 tailored just for you. Click on any subject card below to begin
                 your exploration.
             </p>
+
+            <Button className="max-w-fit" asChild>
+                <Link href={"/subjects"}>
+                    Explore Subjects <MoveUpRight className="ml-2 h-3 w-3" />
+                </Link>
+            </Button>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
                 {userData.subjects?.map((m, index) => (
