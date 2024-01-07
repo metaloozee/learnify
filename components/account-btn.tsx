@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { type User } from "@supabase/auth-helpers-nextjs"
+import { type User } from "@supabase/supabase-js"
 
 import { getURL } from "@/lib/helpers"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -17,9 +17,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { type UserData } from "@/components/navbar"
 import { useSupabase } from "@/app/supabase-provider"
 
-export const UserAccount = ({ user }: { user: User | null }) => {
+export const UserAccount = ({
+    user,
+    userData,
+}: {
+    user: User | null
+    userData: UserData | null
+}) => {
     const router = useRouter()
     const { supabase: supa } = useSupabase()
 
@@ -54,10 +61,11 @@ export const UserAccount = ({ user }: { user: User | null }) => {
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                            {user.user_metadata.full_name}
+                            {userData?.username ?? user.user_metadata.full_name}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
-                            {user.email}
+                            {userData?.first_name ?? ""}{" "}
+                            {userData?.last_name ?? ""}
                         </p>
                     </div>
                 </DropdownMenuLabel>
