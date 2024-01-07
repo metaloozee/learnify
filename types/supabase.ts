@@ -131,16 +131,19 @@ export interface Database {
             }
             subjects: {
                 Row: {
+                    description: string | null
                     subjectid: string
                     subjectname: string
                     teacherid: string | null
                 }
                 Insert: {
+                    description?: string | null
                     subjectid?: string
                     subjectname: string
                     teacherid?: string | null
                 }
                 Update: {
+                    description?: string | null
                     subjectid?: string
                     subjectname?: string
                     teacherid?: string | null
@@ -159,6 +162,7 @@ export interface Database {
                 Row: {
                     first_name: string | null
                     last_name: string | null
+                    subjects: string[] | null
                     userid: string
                     username: string
                     usertype: string
@@ -166,6 +170,7 @@ export interface Database {
                 Insert: {
                     first_name?: string | null
                     last_name?: string | null
+                    subjects?: string[] | null
                     userid: string
                     username: string
                     usertype: string
@@ -173,6 +178,7 @@ export interface Database {
                 Update: {
                     first_name?: string | null
                     last_name?: string | null
+                    subjects?: string[] | null
                     userid?: string
                     username?: string
                     usertype?: string
