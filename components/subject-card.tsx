@@ -11,6 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { SubmitEnrollmentButton } from "@/components/enroll-subject-btn"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export type SubjectData = {
@@ -27,6 +28,7 @@ export type SubjectData = {
         usertype: string
     } | null
 }
+
 export const ExploreSubjectsCard = async ({
     subject,
     session,
@@ -58,15 +60,26 @@ export const ExploreSubjectsCard = async ({
                     </p>
                 </CardContent>
             </div>
-            <CardFooter>
-                {UserData?.subjects?.includes(subject.subjectid) ? (
+            {session ? (
+                <CardFooter>
+                    {UserData?.subjects?.includes(subject.subjectid) ? (
+                        <Button className="w-full" disabled>
+                            Already Enrolled
+                        </Button>
+                    ) : (
+                        <SubmitEnrollmentButton
+                            subject={subject}
+                            session={session}
+                        />
+                    )}
+                </CardFooter>
+            ) : (
+                <CardFooter>
                     <Button className="w-full" disabled>
-                        Already Enrolled
+                        Login to Enroll
                     </Button>
-                ) : (
-                    <Button className="w-full">Enroll</Button>
-                )}
-            </CardFooter>
+                </CardFooter>
+            )}
         </Card>
     )
 }

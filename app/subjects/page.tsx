@@ -6,6 +6,7 @@ export default async function SubjectsIndexPage() {
     const {
         data: { session },
     } = await supabase.auth.getSession()
+
     const { data: subjects } = await supabase
         .from("subjects")
         .select("*, users(*)")
