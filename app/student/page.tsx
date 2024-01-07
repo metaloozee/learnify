@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { StudentSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function StudentIndexPage() {
@@ -15,91 +15,24 @@ export default async function StudentIndexPage() {
         .maybeSingle()
 
     return session && userData ? (
-        <div className="mt-20 flex flex-col gap-5">
+        <div className="mt-20 flex flex-col gap-2 md:gap-5">
             <h1 className="text-3xl md:text-4xl">
                 Hey there{" "}
                 <span className="text-muted-foreground">
                     {userData.first_name}
                 </span>
             </h1>
-            <p className="text-md text-muted-foreground">
+            <p className="text-sm md:text-md text-muted-foreground">
                 Your learning journey awaits. Explore your subjects, dive into
                 personalized content, and embark on a knowledge-filled adventure
                 tailored just for you. Click on any subject card below to begin
                 your exploration.
             </p>
 
-            <div className="mt-8 grid grid-cols-3 gap-10">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                        Teacher's Name Here
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            Advanced Computer Networks
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Master concepts effortlessly with AI-driven
-                            flashcards, adapting to your unique learning style.
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                        Teacher's Name Here
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            Advanced Computer Networks
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Master concepts effortlessly with AI-driven
-                            flashcards, adapting to your unique learning style.
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                        Teacher's Name Here
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            Advanced Computer Networks
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Master concepts effortlessly with AI-driven
-                            flashcards, adapting to your unique learning style.
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                        Teacher's Name Here
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            Advanced Computer Networks
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Master concepts effortlessly with AI-driven
-                            flashcards, adapting to your unique learning style.
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-                        Teacher's Name Here
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            Advanced Computer Networks
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Master concepts effortlessly with AI-driven
-                            flashcards, adapting to your unique learning style.
-                        </p>
-                    </CardContent>
-                </Card>
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
+                {userData.subjects?.map((m, index) => (
+                    <StudentSubjectCard key={index} subjectid={m} />
+                ))}
             </div>
         </div>
     ) : (
