@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -51,11 +50,13 @@ export const OnboardForm = ({ session }: { session: Session }) => {
         try {
             setLoading(true)
 
+            const username = values.username.replace(/\s+/g, "")
+
             const { data: existingUsername, error: existingUsernameError } =
                 await supabase
                     .from("users")
                     .select("*")
-                    .eq("username", values.username)
+                    .eq("username", username)
                     .maybeSingle()
 
             if (existingUsername) {
@@ -69,7 +70,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
 
             const { error: userError } = await supabase.from("users").insert({
                 userid: session.user.id,
-                username: values.username,
+                username: username,
                 usertype: values.type,
                 first_name: values.first_name,
                 last_name: values.last_name,
