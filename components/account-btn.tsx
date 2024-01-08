@@ -61,11 +61,11 @@ export const UserAccount = ({
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                            {userData?.username ?? user.user_metadata.full_name}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
                             {userData?.first_name ?? ""}{" "}
                             {userData?.last_name ?? ""}
+                        </p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                            {userData?.username ?? user.user_metadata.full_name}
                         </p>
                     </div>
                 </DropdownMenuLabel>
