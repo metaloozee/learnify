@@ -99,7 +99,7 @@ export const StudentSubjectCard = async ({
     return subjectData ? (
         <Link
             className="hover:-translate-y-1 transition-all duration-200"
-            href={`/subject/${subjectData.subjectid}`}
+            href={`/student/subject/${subjectData.subjectid}`}
         >
             <Card className="h-full w-full">
                 <CardHeader className="text-sm flex flex-row items-center justify-between space-y-0 pb-0">
