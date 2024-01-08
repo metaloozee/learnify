@@ -50,7 +50,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
         try {
             setLoading(true)
 
-            const username = values.username.replace(/\s+/g, "")
+            const username = values.username.replace(/\s+/g, "").toLowerCase()
 
             const { data: existingUsername, error: existingUsernameError } =
                 await supabase
