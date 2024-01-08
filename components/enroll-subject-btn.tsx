@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import type { Session } from "@supabase/supabase-js"
 import { RotateCw } from "lucide-react"
 
@@ -16,6 +17,7 @@ export const SubmitEnrollmentButton = ({
     subject: SubjectData
     session: Session | null
 }) => {
+    const router = useRouter()
     const { toast } = useToast()
     const { supabase } = useSupabase()
 
@@ -62,6 +64,7 @@ export const SubmitEnrollmentButton = ({
             })
         } finally {
             setLoading(false)
+            return router.refresh()
         }
     }
 
