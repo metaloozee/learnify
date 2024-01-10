@@ -11,6 +11,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { SubmitEnrollmentButton } from "@/components/enroll-subject-btn"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 import type { Subject } from "@/app/teacher/page"
@@ -140,5 +141,21 @@ export const TeacherSubjectCard = ({ subject }: { subject: Subject }) => {
                 </CardContent>
             </Card>
         </Link>
+    )
+}
+
+export const SkeletonCard = () => {
+    return (
+        <Card className="h-full w-full">
+            <CardHeader className="text-sm flex flex-row items-center justify-between space-y-0 pb-0"></CardHeader>
+            <CardContent>
+                <Skeleton className="w-[200px] h-[30px] rounded-sm mb-4" />
+                <div className="flex flex-col gap-2">
+                    <Skeleton className="w-[300px] h-[10px] rounded-full" />
+                    <Skeleton className="w-[350px] h-[10px] rounded-full" />
+                    <Skeleton className="w-full h-[10px] rounded-full" />
+                </div>
+            </CardContent>
+        </Card>
     )
 }

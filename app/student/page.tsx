@@ -1,8 +1,9 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import { MoveUpRight } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { StudentSubjectCard } from "@/components/subject-card"
+import { SkeletonCard, StudentSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function StudentIndexPage() {
@@ -40,9 +41,18 @@ export default async function StudentIndexPage() {
             </Button>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
-                {userData.subjects?.map((m, index) => (
-                    <StudentSubjectCard key={index} subjectid={m} />
-                ))}
+                <Suspense
+                    fallback={
+                        <>
+                            <SkeletonCard />
+                            <SkeletonCard />
+                        </>
+                    }
+                >
+                    {userData.subjects?.map((m, index) => (
+                        <StudentSubjectCard key={index} subjectid={m} />
+                    ))}
+                </Suspense>
             </div>
         </div>
     ) : (

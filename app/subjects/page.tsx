@@ -1,4 +1,6 @@
-import { ExploreSubjectsCard } from "@/components/subject-card"
+import { Suspense } from "react"
+
+import { ExploreSubjectsCard, SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function SubjectsIndexPage() {
@@ -28,13 +30,23 @@ export default async function SubjectsIndexPage() {
             </p>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
-                {subjects?.map((m, index) => (
-                    <ExploreSubjectsCard
-                        key={index}
-                        subject={m}
-                        session={session}
-                    />
-                ))}
+                <Suspense
+                    fallback={
+                        <>
+                            <SkeletonCard />
+                            <SkeletonCard />
+                            <SkeletonCard />
+                        </>
+                    }
+                >
+                    {subjects?.map((m, index) => (
+                        <ExploreSubjectsCard
+                            key={index}
+                            subject={m}
+                            session={session}
+                        />
+                    ))}
+                </Suspense>
             </div>
         </div>
     )

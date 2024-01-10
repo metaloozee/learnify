@@ -1,4 +1,6 @@
-import { TeacherSubjectCard } from "@/components/subject-card"
+import { Suspense } from "react"
+
+import { SkeletonCard, TeacherSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export type Subject = {
@@ -39,9 +41,18 @@ export default async function TeacherIndexPage() {
             </p>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
-                {subjects?.map((m, index) => (
-                    <TeacherSubjectCard subject={m} key={index} />
-                ))}
+                <Suspense
+                    fallback={
+                        <>
+                            <SkeletonCard />
+                            <SkeletonCard />
+                        </>
+                    }
+                >
+                    {subjects?.map((m, index) => (
+                        <TeacherSubjectCard subject={m} key={index} />
+                    ))}
+                </Suspense>
             </div>
         </div>
     ) : (
