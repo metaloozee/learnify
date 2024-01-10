@@ -8,7 +8,7 @@ export type Subject = {
     teacherid: string | null
 }
 
-export default async function TeacherSubjectIndexPage() {
+export default async function TeacherIndexPage() {
     const supabase = await createServerSupabaseClient()
     const {
         data: { session },
