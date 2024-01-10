@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { SubmitEnrollmentButton } from "@/components/enroll-subject-btn"
 import { createServerSupabaseClient } from "@/app/supabase-server"
+import type { Subject } from "@/app/teacher/page"
 
 export type SubjectData = {
     description: string | null
@@ -99,7 +100,7 @@ export const StudentSubjectCard = async ({
     return subjectData ? (
         <Link
             className="hover:-translate-y-1 transition-all duration-200"
-            href={`/student/subject/${subjectData.subjectid}`}
+            href={`/teacher/subject/${subjectData.subjectid}`}
         >
             <Card className="h-full w-full">
                 <CardHeader className="text-sm flex flex-row items-center justify-between space-y-0 pb-0">
@@ -118,5 +119,26 @@ export const StudentSubjectCard = async ({
         </Link>
     ) : (
         <></>
+    )
+}
+
+export const TeacherSubjectCard = ({ subject }: { subject: Subject }) => {
+    return (
+        <Link
+            className="hover:-translate-y-1 transition-all duration-200"
+            href={`/student/subject/${subject.subjectid}`}
+        >
+            <Card className="h-full w-full">
+                <CardHeader className="text-sm flex flex-row items-center justify-between space-y-0 pb-0"></CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">
+                        {subject.subjectname}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        {subject.description}
+                    </p>
+                </CardContent>
+            </Card>
+        </Link>
     )
 }
