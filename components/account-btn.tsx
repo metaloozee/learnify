@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { type User } from "@supabase/supabase-js"
+import { UserIcon } from "lucide-react"
 
 import { getURL } from "@/lib/helpers"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -53,7 +54,9 @@ export const UserAccount = ({
                 >
                     <Avatar>
                         <AvatarImage src={user.user_metadata.avatar_url} />
-                        <AvatarFallback>yo</AvatarFallback>
+                        <AvatarFallback>
+                            <UserIcon className="text-muted-foreground/90" />
+                        </AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
