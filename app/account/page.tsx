@@ -1,3 +1,7 @@
+import React from "react"
+
+import { AccountSettingsForm } from "@/components/settings-form"
+import { SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function Account() {
@@ -12,15 +16,19 @@ export default async function Account() {
         .maybeSingle()
 
     return session && userData ? (
-        <div className="mt-20 flex flex-col gap-5">
+        <div className="mt-20 flex flex-col gap-5 w-full">
             <h1 className="text-3xl md:text-4xl">
-                Exciting Things Are{" "}
-                <span className="text-muted-foreground">Coming Soon!</span>
+                Manage Your{" "}
+                <span className="text-muted-foreground">Account</span>
             </h1>
             <p className="text-md text-muted-foreground">
-                Stay tuned for our upcoming launch. We can't wait to share it
-                with you.
+                Take control of your account by customizing your credentials and
+                information. Update your details seamlessly and ensure your
+                learning experience is personalized to your preferences.
             </p>
+            <React.Suspense fallback={<SkeletonCard />}>
+                <AccountSettingsForm session={session} user={userData} />
+            </React.Suspense>
         </div>
     ) : (
         <div className="mt-20 flex flex-col gap-5">
