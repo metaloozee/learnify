@@ -82,7 +82,11 @@ export const UserAccount = ({
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                        <Button onClick={handleLogout} className="w-full">
+                        <Button
+                            onClick={handleLogout}
+                            variant={"destructive"}
+                            className="w-full"
+                        >
                             Log Out
                         </Button>
                     </DropdownMenuItem>
