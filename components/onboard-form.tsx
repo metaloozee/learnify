@@ -80,14 +80,14 @@ export const OnboardForm = ({ session }: { session: Session }) => {
             }
 
             return toast({
-                title: "Hooray!!",
-                description: "You have successfully registered yourself!",
+                title: "Success!",
+                description: "You have successfully registered yourself.",
             })
         } catch (e: any) {
             console.error(e)
 
             return toast({
-                title: "Uh Oh",
+                title: "Oops! Something went wrong.",
                 description: e.message,
                 variant: "destructive",
             })

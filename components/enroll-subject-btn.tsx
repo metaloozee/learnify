@@ -52,13 +52,13 @@ export const SubmitEnrollmentButton = ({
             }
 
             return toast({
-                title: "Hooray!!",
-                description: "You have successfully enrolled yourself",
+                title: "Success!",
+                description: "You have successfully enrolled yourself.",
             })
         } catch (e: any) {
             console.error(e)
             return toast({
-                title: "Uh oh!",
+                title: "Oops! Something went wrong.",
                 description: e.message,
                 variant: "destructive",
             })

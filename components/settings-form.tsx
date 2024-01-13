@@ -95,14 +95,14 @@ export const AccountSettingsForm = ({
             }
 
             return toast({
-                title: "Hooray!!",
-                description: "You have successfully updated yourself!",
+                title: "Success!",
+                description: "You have successfully updated yourself.",
             })
         } catch (err: any) {
             console.error(err)
 
             return toast({
-                title: "Uh Oh",
+                title: "Oops! Something went wrong.",
                 description: err.message,
                 variant: "destructive",
             })
