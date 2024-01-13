@@ -3,6 +3,7 @@ import "./globals.css"
 import { Lora } from "next/font/google"
 
 import { Toaster } from "@/components/ui/toaster"
+import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
 import { ThemeProvider } from "@/components/theme-provider"
 import SupabaseProvider from "@/app/supabase-provider"
@@ -34,6 +35,7 @@ export default function RootLayout({
                                 {children}
                             </div>
                             <Toaster />
+                            <Footer />
                         </div>
                     </ThemeProvider>
                 </SupabaseProvider>
