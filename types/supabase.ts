@@ -71,21 +71,21 @@ export interface Database {
                     noteid: string
                     notetitle: string
                     subjectid: string | null
-                    userid: string | null
+                    updated_at: string | null
                 }
                 Insert: {
                     notecontent: string
                     noteid?: string
                     notetitle: string
                     subjectid?: string | null
-                    userid?: string | null
+                    updated_at?: string | null
                 }
                 Update: {
                     notecontent?: string
                     noteid?: string
                     notetitle?: string
                     subjectid?: string | null
-                    userid?: string | null
+                    updated_at?: string | null
                 }
                 Relationships: [
                     {

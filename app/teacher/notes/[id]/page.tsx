@@ -8,7 +8,7 @@ export type NoteData = {
     noteid: string
     notetitle: string
     subjectid: string | null
-    userid: string | null
+    updated_at: string | null
 }
 
 export default async function TeacherNotesIndexPage({
