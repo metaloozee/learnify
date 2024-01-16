@@ -1,4 +1,15 @@
+import Link from "next/link"
+
+import { TeacherPlayground } from "@/components/teacher-playground"
 import { createServerSupabaseClient } from "@/app/supabase-server"
+
+export type NoteData = {
+    notecontent: string
+    noteid: string
+    notetitle: string
+    subjectid: string | null
+    userid: string | null
+}
 
 export default async function TeacherNotesIndexPage({
     params,
@@ -14,6 +25,7 @@ export default async function TeacherNotesIndexPage({
         .from("users")
         .select("*")
         .eq("userid", session?.user.id ?? "")
+        .eq("usertype", "teacher")
         .single()
     const { data: noteData } = await supabase
         .from("notes")
@@ -28,15 +40,26 @@ export default async function TeacherNotesIndexPage({
         .single()
 
     return session && teacherData && noteData && subjectData ? (
-        <div className="mt-20 flex flex-col gap-5">
-            <h1 className="text-3xl md:text-4xl">
-                Exciting Things Are{" "}
-                <span className="text-muted-foreground">Coming Soon!</span>
-            </h1>
-            <p className="text-md text-muted-foreground">
-                Stay tuned for our upcoming launch. We can't wait to share it
-                with you.
-            </p>
+        <div className="flex flex-col gap-5">
+            <span className="text-xs text-muted-foreground">
+                Dashboard &gt;{" "}
+                <Link href={`/teacher/subject/${subjectData.subjectid}`}>
+                    {subjectData.subjectname}
+                </Link>{" "}
+                &gt;{" "}
+                <Link href={`/teacher/notes/${noteData.noteid}`}>
+                    {noteData.notetitle}
+                </Link>
+            </span>
+
+            <div className="mt-10">
+                <TeacherPlayground
+                    session={session}
+                    user={teacherData}
+                    subject={subjectData}
+                    note={noteData}
+                />
+            </div>
         </div>
     ) : (
         <div className="mt-20 flex flex-col gap-5">
