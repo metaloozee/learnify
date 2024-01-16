@@ -66,9 +66,7 @@ export const columns: ColumnDef<NotesTableData>[] = [
             return (
                 <div className="flex gap-2">
                     <Button size={"sm"} asChild>
-                        <Link
-                            href={`/teacher/playground/${row.original.noteid}`}
-                        >
+                        <Link href={`/teacher/notes/${row.original.noteid}`}>
                             Edit Note <FilePenLine className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
