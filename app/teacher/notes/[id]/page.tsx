@@ -40,7 +40,7 @@ export default async function TeacherNotesIndexPage({
         .single()
 
     return session && teacherData && noteData && subjectData ? (
-        <div className="flex flex-col gap-5">
+        <div className="w-full flex flex-col gap-5">
             <span className="text-xs text-muted-foreground">
                 Dashboard &gt;{" "}
                 <Link href={`/teacher/subject/${subjectData.subjectid}`}>
@@ -52,7 +52,7 @@ export default async function TeacherNotesIndexPage({
                 </Link>
             </span>
 
-            <div className="mt-10">
+            <div className="mt-5 w-full">
                 <TeacherPlayground
                     session={session}
                     user={teacherData}

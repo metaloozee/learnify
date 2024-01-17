@@ -1,11 +1,32 @@
 "use client"
 
 import React from "react"
+import { useRouter } from "next/navigation"
+import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
+import { RotateCw } from "lucide-react"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import { Textarea } from "@/components/ui/textarea"
+import { useToast } from "@/components/ui/use-toast"
 import type { UserData } from "@/components/navbar"
 import { useSupabase } from "@/app/supabase-provider"
 import type { NoteData } from "@/app/teacher/notes/[id]/page"
@@ -18,48 +39,221 @@ interface TeacherPlaygroundProps {
     note: NoteData
 }
 
+const TeacherPlaygroundFormSchema = z.object({
+    title: z.string().optional(),
+    content: z.string().min(10).optional(),
+    description: z.string().optional(),
+})
+
 export const TeacherPlayground = ({
     session,
     user,
     subject,
     note,
 }: TeacherPlaygroundProps) => {
+    const router = useRouter()
     const { supabase } = useSupabase()
+    const { toast } = useToast()
+
+    const [loading, setLoading] = React.useState(false)
+    const [width, setWidth] = React.useState(window.innerWidth)
+
+    React.useEffect(() => {
+        const handleWindowSizeChange = () => {
+            setWidth(window.innerWidth)
+        }
+
+        window.addEventListener("resize", handleWindowSizeChange)
+
+        return () => {
+            window.removeEventListener("resize", handleWindowSizeChange)
+        }
+    }, [])
+
+    const form = useForm<z.infer<typeof TeacherPlaygroundFormSchema>>({
+        resolver: zodResolver(TeacherPlaygroundFormSchema),
+        defaultValues: {
+            title: note.notetitle,
+            content: note.notecontent,
+            description: note.notecontent.slice(0, 50),
+        },
+    })
+
+    const onSubmit = async (
+        values: z.infer<typeof TeacherPlaygroundFormSchema>
+    ) => {
+        try {
+            setLoading(true)
+
+            const { error } = await supabase
+                .from("notes")
+                .update({
+                    notetitle: values.title,
+                    notecontent: values.content,
+                })
+                .eq("noteid", note.noteid)
+            if (error) {
+                throw new Error(error.message)
+            }
+
+            return toast({
+                title: "Success!",
+                description: "You have successfullt updated the notes.",
+            })
+        } catch (e: any) {
+            console.error(e)
+
+            form.reset()
+
+            return toast({
+                title: "Oops! Something went wrong.",
+                description: e.message,
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
-        <div>
-            <h1 className="text-3xl md:text-4xl">
-                Exciting Things Are{" "}
-                <span className="text-muted-foreground">Coming Soon!</span>
-            </h1>
-            <p className="text-md text-muted-foreground">
-                Stay tuned for our upcoming launch. We can't wait to share it
-                with you.
-            </p>
-
-            <Card className="mt-10 flex flex-col justify-between">
-                <div>
-                    <CardHeader className="flex flex-wrap flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                        <Badge className="max-w-fit" variant={"default"}>
-                            RAW DATA
-                        </Badge>
-                        <Badge className="max-w-fit" variant={"outline"}>
-                            {user.first_name} {user.last_name}
-                        </Badge>
-                        <Badge className="max-w-fit" variant={"outline"}>
-                            {subject.subjectname}
-                        </Badge>
-                    </CardHeader>
-                    <CardContent>
-                        <h1 className="mt-2 text-2xl font-bold">
-                            {note.notetitle}
-                        </h1>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            {note.notecontent}
-                        </p>
-                    </CardContent>
-                </div>
-            </Card>
-        </div>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                {width >= 786 ? (
+                    <ResizablePanelGroup
+                        direction="horizontal"
+                        className="gap-5"
+                    >
+                        <ResizablePanel defaultSize={80}>
+                            <FormField
+                                control={form.control}
+                                name="content"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="Lorem Ipsum"
+                                                className="col-span-3 p-4 min-h-[520px]"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </ResizablePanel>
+                        <ResizableHandle withHandle />
+                        <ResizablePanel className="flex flex-col justify-between">
+                            <div className="flex flex-col gap-5">
+                                <FormField
+                                    control={form.control}
+                                    name="title"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs">
+                                                Note Title
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    placeholder="Lorem Ipsum"
+                                                    className="p-4"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    disabled
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs">
+                                                Description
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="Lorem Ipsum"
+                                                    className="p-4 resize-none"
+                                                    disabled
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            {loading ? (
+                                <Button
+                                    className="w-full"
+                                    disabled
+                                    type="submit"
+                                >
+                                    <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                                    Please Wait
+                                </Button>
+                            ) : (
+                                <Button className="w-full" type="submit">
+                                    Submit
+                                </Button>
+                            )}
+                        </ResizablePanel>
+                    </ResizablePanelGroup>
+                ) : (
+                    <div className="flex flex-col gap-5">
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">
+                                        Note Title
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder="Lorem Ipsum"
+                                            className="p-4"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="content"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">
+                                        Note Content
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Lorem Ipsum"
+                                            className="col-span-3 p-4 min-h-[520px]"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        {loading ? (
+                            <Button className="w-full" disabled type="submit">
+                                <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                                Please Wait
+                            </Button>
+                        ) : (
+                            <Button className="w-full" type="submit">
+                                Submit
+                            </Button>
+                        )}
+                    </div>
+                )}
+            </form>
+        </Form>
     )
 }
