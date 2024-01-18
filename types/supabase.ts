@@ -71,6 +71,7 @@ export interface Database {
                     noteid: string
                     notetitle: string
                     subjectid: string | null
+                    teacherid: string | null
                     updated_at: string | null
                 }
                 Insert: {
@@ -78,6 +79,7 @@ export interface Database {
                     noteid?: string
                     notetitle: string
                     subjectid?: string | null
+                    teacherid?: string | null
                     updated_at?: string | null
                 }
                 Update: {
@@ -85,6 +87,7 @@ export interface Database {
                     noteid?: string
                     notetitle?: string
                     subjectid?: string | null
+                    teacherid?: string | null
                     updated_at?: string | null
                 }
                 Relationships: [
@@ -94,6 +97,13 @@ export interface Database {
                         isOneToOne: false
                         referencedRelation: "subjects"
                         referencedColumns: ["subjectid"]
+                    },
+                    {
+                        foreignKeyName: "notes_teacherid_fkey"
+                        columns: ["teacherid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
                     },
                 ]
             }
