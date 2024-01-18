@@ -42,8 +42,8 @@ export const UserAccount = ({
 
     const handleLogout = async () => {
         await supa.auth.signOut()
-        router.refresh()
         router.push("/")
+        router.refresh()
     }
 
     return user ? (
