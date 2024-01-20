@@ -107,7 +107,7 @@ export interface Database {
                     },
                 ]
             }
-            "studentenrollment ": {
+            studentenrollment: {
                 Row: {
                     enrollmentid: string
                     subjectid: string
@@ -125,14 +125,14 @@ export interface Database {
                 }
                 Relationships: [
                     {
-                        foreignKeyName: "studentenrollment _subjectid_fkey"
+                        foreignKeyName: "studentenrollment_subjectid_fkey"
                         columns: ["subjectid"]
                         isOneToOne: false
                         referencedRelation: "subjects"
                         referencedColumns: ["subjectid"]
                     },
                     {
-                        foreignKeyName: "studentenrollment _userid_fkey"
+                        foreignKeyName: "studentenrollment_userid_fkey"
                         columns: ["userid"]
                         isOneToOne: false
                         referencedRelation: "users"
