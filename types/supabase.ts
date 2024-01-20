@@ -107,6 +107,39 @@ export interface Database {
                     },
                 ]
             }
+            "studentenrollment ": {
+                Row: {
+                    enrollmentid: string
+                    subjectid: string
+                    userid: string
+                }
+                Insert: {
+                    enrollmentid?: string
+                    subjectid: string
+                    userid: string
+                }
+                Update: {
+                    enrollmentid?: string
+                    subjectid?: string
+                    userid?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "studentenrollment _subjectid_fkey"
+                        columns: ["subjectid"]
+                        isOneToOne: false
+                        referencedRelation: "subjects"
+                        referencedColumns: ["subjectid"]
+                    },
+                    {
+                        foreignKeyName: "studentenrollment _userid_fkey"
+                        columns: ["userid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
+                    },
+                ]
+            }
             studentprogress: {
                 Row: {
                     contentid: string | null
@@ -172,7 +205,6 @@ export interface Database {
                 Row: {
                     first_name: string | null
                     last_name: string | null
-                    subjects: string[] | null
                     userid: string
                     username: string
                     usertype: string
@@ -180,7 +212,6 @@ export interface Database {
                 Insert: {
                     first_name?: string | null
                     last_name?: string | null
-                    subjects?: string[] | null
                     userid: string
                     username: string
                     usertype: string
@@ -188,7 +219,6 @@ export interface Database {
                 Update: {
                     first_name?: string | null
                     last_name?: string | null
-                    subjects?: string[] | null
                     userid?: string
                     username?: string
                     usertype?: string
