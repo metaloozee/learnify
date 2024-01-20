@@ -10,21 +10,14 @@ export default async function StudentSubjectIndexPage({
     const {
         data: { session },
     } = await supabase.auth.getSession()
-    const { data: subject } = await supabase
-        .from("subjects")
-        .select("*")
+    const { data: subjectData } = await supabase
+        .from("studentenrollment")
+        .select("userid")
+        .eq("userid", session?.user?.id ?? "")
         .eq("subjectid", params.id)
-        .single()
-    const { data: studentData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("userid", session?.user.id ?? "")
-        .single()
+        .maybeSingle()
 
-    return session &&
-        subject &&
-        studentData &&
-        studentData.subjects?.includes(subject.subjectid) ? (
+    return session && subjectData ? (
         <div className="mt-20 flex flex-col gap-5">
             <h1 className="text-3xl md:text-4xl">
                 Exciting Things Are{" "}

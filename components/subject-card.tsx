@@ -12,79 +12,8 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SubmitEnrollmentButton } from "@/components/enroll-subject-btn"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 import type { Subject } from "@/app/teacher/page"
-
-export type SubjectData = {
-    description: string | null
-    subjectid: string
-    subjectname: string
-    teacherid: string | null
-    users: {
-        first_name: string | null
-        last_name: string | null
-        subjects: string[] | null
-        userid: string
-        username: string
-        usertype: string
-    } | null
-}
-
-export const ExploreSubjectsCard = async ({
-    subject,
-    session,
-}: {
-    subject: SubjectData
-    session: Session | null
-}) => {
-    const supabase = await createServerSupabaseClient()
-    const { data: UserData } = await supabase
-        .from("users")
-        .select("subjects")
-        .eq("userid", session?.user.id ?? "")
-        .single()
-
-    return (
-        <Card className="flex flex-col justify-between">
-            <div>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <Badge className="max-w-fit" variant={"outline"}>
-                        {subject?.users?.first_name} {subject?.users?.last_name}
-                    </Badge>
-                </CardHeader>
-                <CardContent>
-                    <h1 className="mt-2 text-2xl font-bold">
-                        {subject?.subjectname}
-                    </h1>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        {subject?.description}
-                    </p>
-                </CardContent>
-            </div>
-            {session ? (
-                <CardFooter>
-                    {UserData?.subjects?.includes(subject.subjectid) ? (
-                        <Button className="w-full" disabled>
-                            Already Enrolled
-                        </Button>
-                    ) : (
-                        <SubmitEnrollmentButton
-                            subject={subject}
-                            session={session}
-                        />
-                    )}
-                </CardFooter>
-            ) : (
-                <CardFooter>
-                    <Button className="w-full" disabled>
-                        Login to Enroll
-                    </Button>
-                </CardFooter>
-            )}
-        </Card>
-    )
-}
 
 export const StudentSubjectCard = async ({
     subjectid,
