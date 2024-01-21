@@ -36,10 +36,6 @@ export default async function TeacherSubjectIndexPage({
         .eq("subjectid", params.id)
         .eq("teacherid", session?.user.id ?? "")
         .single()
-    const { data: notes } = await supabase
-        .from("notes")
-        .select("*")
-        .eq("subjectid", subject?.subjectid ?? "")
 
     return session && userData && subject ? (
         <div className="w-full h-full flex flex-col justify-center">

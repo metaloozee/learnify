@@ -62,33 +62,38 @@ export const NotesCard = async ({
 }) => {
     const notes = await getNote({ q: q, subjectid: subjectid })
 
-    return notes.data
-        ? notes.data.map((note, index) => (
-              <Link
-                  key={index}
-                  className="hover:-translate-y-1 transition-all duration-200"
-                  href={`/teacher/notes/${note.noteid}`}
-              >
-                  <Card className="h-full w-full">
-                      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                          <Badge className="max-w-fit" variant={"outline"}>
-                              {new Date(note.updated_at as string)
-                                  .toUTCString()
-                                  .slice(0, 17)}
-                          </Badge>
-                      </CardHeader>
+    return notes.data && notes.data.length > 0 ? (
+        notes.data.map((note, index) => (
+            <Link
+                key={index}
+                className="hover:-translate-y-1 transition-all duration-200"
+                href={`/teacher/notes/${note.noteid}`}
+            >
+                <Card className="h-full w-full">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <Badge className="max-w-fit" variant={"outline"}>
+                            {new Date(note.updated_at as string)
+                                .toUTCString()
+                                .slice(0, 17)}
+                        </Badge>
+                    </CardHeader>
 
-                      <CardContent>
-                          <div className="text-2xl font-bold">
-                              {note.notetitle}
-                          </div>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                              {note.notecontent.slice(0, 100)}
-                              {"..."}
-                          </p>
-                      </CardContent>
-                  </Card>
-              </Link>
-          ))
-        : "nuh uh"
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {note.notetitle}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            {note.notecontent.slice(0, 100)}
+                            {"..."}
+                        </p>
+                    </CardContent>
+                </Card>
+            </Link>
+        ))
+    ) : (
+        <p className="text-md text-muted-foreground col-span-3">
+            Uh-oh! The notes shelf is looking as empty as a student's backpack
+            after finals.
+        </p>
+    )
 }
