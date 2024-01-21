@@ -1,16 +1,25 @@
+import { Suspense } from "react"
 import { FilePlus2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { NotesDataTable } from "@/components/notes-data-table"
+import { NotesCard } from "@/components/note-card"
+import { Search } from "@/components/search"
+import { SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function TeacherSubjectIndexPage({
     params,
+    searchParams,
 }: {
     params: any
+    searchParams?: {
+        query?: string
+    }
 }) {
     const supabase = await createServerSupabaseClient()
+
+    const query = searchParams?.query || ""
 
     const {
         data: { session },
@@ -29,7 +38,7 @@ export default async function TeacherSubjectIndexPage({
         .single()
     const { data: notes } = await supabase
         .from("notes")
-        .select("noteid, notetitle, notecontent")
+        .select("*")
         .eq("subjectid", subject?.subjectid ?? "")
 
     return session && userData && subject ? (
@@ -62,7 +71,26 @@ export default async function TeacherSubjectIndexPage({
                             <FilePlus2 className="mr-2 h-4 w-4" /> Create Note
                         </Button>
                     </div>
-                    {/* {notes && <NotesDataTable data={notes} />} */}
+                    <div className="mt-10 flex flex-col gap-5">
+                        <Search placeholder="Search Notes..." />
+
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-10">
+                            <Suspense
+                                key={query}
+                                fallback={
+                                    <>
+                                        <SkeletonCard />
+                                        <SkeletonCard />
+                                    </>
+                                }
+                            >
+                                <NotesCard
+                                    q={query}
+                                    subjectid={subject.subjectid}
+                                />
+                            </Suspense>
+                        </div>
+                    </div>
                 </TabsContent>
                 <TabsContent value="students">coming soon</TabsContent>
             </Tabs>
