@@ -51,7 +51,7 @@ export const UserAccount = ({
             <DropdownMenuTrigger asChild>
                 <Button
                     variant={"ghost"}
-                    className="ml-1 relative h-8 w-8 rounded-full"
+                    className="ml-1 relative h-8 w-8 rounded-full shadow-xl"
                 >
                     <Avatar>
                         <AvatarImage src={user.user_metadata.avatar_url} />
@@ -94,6 +94,8 @@ export const UserAccount = ({
             </DropdownMenuContent>
         </DropdownMenu>
     ) : (
-        <Button onClick={handleLogin}>Login</Button>
+        <Button className="shadow-xl" onClick={handleLogin}>
+            Login
+        </Button>
     )
 }

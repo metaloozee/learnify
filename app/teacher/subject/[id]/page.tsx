@@ -1,3 +1,6 @@
+import { FilePlus2 } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NotesDataTable } from "@/components/notes-data-table"
 import { createServerSupabaseClient } from "@/app/supabase-server"
@@ -37,7 +40,29 @@ export default async function TeacherSubjectIndexPage({
                     <TabsTrigger value="students">Manage Students</TabsTrigger>
                 </TabsList>
                 <TabsContent value="notes">
-                    {notes && <NotesDataTable data={notes} />}
+                    <div className="mt-16 flex flex-col gap-5">
+                        <h1 className="text-3xl md:text-4xl">
+                            Note-orious{" "}
+                            <span className="text-muted-foreground">
+                                Teacher Hub
+                            </span>
+                        </h1>
+                        <p className="text-md text-muted-foreground">
+                            Effortlessly organize and enhance your teaching
+                            materials. Create, edit, and organize notes to
+                            provide a seamless learning experience for your
+                            students. Stay in control of your subject's content
+                            and empower your students with engaging educational
+                            resources.
+                        </p>
+                        <Button
+                            variant={"default"}
+                            className="max-w-fit shadow-xl"
+                        >
+                            <FilePlus2 className="mr-2 h-4 w-4" /> Create Note
+                        </Button>
+                    </div>
+                    {/* {notes && <NotesDataTable data={notes} />} */}
                 </TabsContent>
                 <TabsContent value="students">coming soon</TabsContent>
             </Tabs>
