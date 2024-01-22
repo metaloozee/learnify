@@ -120,6 +120,7 @@ export default async function TeacherSubjectIndexPage({
                             >
                                 <NotesCard
                                     q={query}
+                                    type="teacher"
                                     subjectid={subject.subjectid}
                                 />
                             </Suspense>
