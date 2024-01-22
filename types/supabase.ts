@@ -40,6 +40,7 @@ export interface Database {
                     contenttitle: string
                     contenttype: string
                     noteid: string | null
+                    studentid: string | null
                 }
                 Insert: {
                     contentbody: string
@@ -47,6 +48,7 @@ export interface Database {
                     contenttitle: string
                     contenttype: string
                     noteid?: string | null
+                    studentid?: string | null
                 }
                 Update: {
                     contentbody?: string
@@ -54,6 +56,7 @@ export interface Database {
                     contenttitle?: string
                     contenttype?: string
                     noteid?: string | null
+                    studentid?: string | null
                 }
                 Relationships: [
                     {
@@ -62,6 +65,13 @@ export interface Database {
                         isOneToOne: false
                         referencedRelation: "notes"
                         referencedColumns: ["noteid"]
+                    },
+                    {
+                        foreignKeyName: "generatedcontent_studentid_fkey"
+                        columns: ["studentid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
                     },
                 ]
             }
