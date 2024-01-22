@@ -46,7 +46,7 @@ export default async function StudentSubjectIndexPage({
 
             <div className="mt-10 flex flex-col gap-5">
                 <Search placeholder="Search Notes..." />
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
                     <Suspense
                         key={query}
                         fallback={
