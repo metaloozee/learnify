@@ -1,3 +1,16 @@
+import { Suspense } from "react"
+import { revalidatePath } from "next/cache"
+import { cookies } from "next/headers"
+import Link from "next/link"
+import { ArrowLeftIcon, FileTextIcon, SymbolIcon } from "@radix-ui/react-icons"
+import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
+import { CookingPot, MoveLeft } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CustomMDX } from "@/components/mdx-remote"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function StudentNotesIndexPage({
@@ -28,16 +41,157 @@ export default async function StudentNotesIndexPage({
         .eq("subjectid", noteData?.subjectid ?? "")
         .single()
 
+    const { data: notes } = await supabase
+        .from("generatedcontent")
+        .select("*")
+        .eq("noteid", noteData?.noteid ?? "")
+        .eq("contenttype", "note")
+        .maybeSingle()
+    const { data: summary } = await supabase
+        .from("generatedcontent")
+        .select("*")
+        .eq("noteid", noteData?.noteid ?? "")
+        .eq("contenttype", "summary")
+        .maybeSingle()
+    const { data: flashCards } = await supabase
+        .from("generatedcontent")
+        .select("*")
+        .eq("noteid", noteData?.noteid ?? "")
+        .eq("contenttype", "flash_cards")
+        .maybeSingle()
+
+    const handleGeneratePersonalizedNotes = async () => {
+        "use server"
+
+        const supabase = await createServerActionClient({ cookies })
+    }
+
+    const handleGenerateFlashCards = async () => {
+        "use server"
+
+        const supabase = await createServerActionClient({ cookies })
+    }
+
     return session && studentData && noteData && subjectData ? (
-        <div className="mt-20 flex flex-col gap-5">
-            <h1 className="text-3xl md:text-4xl">
-                Exciting Things Are{" "}
-                <span className="text-muted-foreground">Coming Soon!</span>
-            </h1>
-            <p className="text-md text-muted-foreground">
-                Stay tuned for our upcoming launch. We can't wait to share it
-                with you.
-            </p>
+        <div className="w-full h-full flex flex-col justify-center">
+            <Button
+                className="text-muted-foreground max-w-fit"
+                asChild
+                size={null}
+                variant={"link"}
+            >
+                <Link
+                    className="hover:underline"
+                    href={`/student/subject/${noteData.subjectid}`}
+                >
+                    <ArrowLeftIcon className="mr-2" />
+                    nevermind
+                </Link>
+            </Button>
+            <Tabs className="mt-10" defaultValue="note">
+                <TabsList>
+                    <TabsTrigger value="note">Personalized Note</TabsTrigger>
+                    <TabsTrigger value="flash_cards">Flash Cards</TabsTrigger>
+                    <TabsTrigger disabled value="mini_quiz">
+                        Mini Quiz
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="note">
+                    {notes ? (
+                        <Suspense
+                            fallback={
+                                <div className="mt-5 flex flex-col gap-5 ">
+                                    <Skeleton className="h-10 w-[800px]" />
+                                    <Skeleton className="h-4 w-[600px]" />
+                                    <Skeleton className="h-4 w-[550px]" />
+                                    <Skeleton className="h-4 w-[300px]" />
+                                </div>
+                            }
+                        >
+                            <ScrollArea className="mt-5 h-[432px] ">
+                                <CustomMDX source={notes.contentbody} />
+                            </ScrollArea>
+                            <div className="mt-10 flex flex-row gap-5">
+                                <Button>
+                                    <FileTextIcon className="mr-2" /> Generate
+                                    Summary
+                                </Button>
+                                <Button variant={"secondary"}>
+                                    Regenerate Note{" "}
+                                    <SymbolIcon className="ml-2" />
+                                </Button>
+                            </div>
+                        </Suspense>
+                    ) : (
+                        <div className="mt-5 flex flex-col gap-5">
+                            <h1 className="text-3xl md:text-4xl">
+                                Content Not Found
+                            </h1>
+                            <p className="text-md text-muted-foreground">
+                                Worry not! Click the mystical 'Generate Content'
+                                button below, and watch as personalized notes
+                                magically materialize. It's like summoning your
+                                own army of knowledge imps, only less chaotic
+                                and with better grammar!
+                            </p>
+                            <form action={handleGeneratePersonalizedNotes}>
+                                <Button type="submit" className="max-w-fit">
+                                    Generate Content{" "}
+                                    <CookingPot className="ml-2 h-4 w-4" />
+                                </Button>
+                            </form>
+                        </div>
+                    )}
+                </TabsContent>
+                <TabsContent value="flash_cards">
+                    {flashCards ? (
+                        <Suspense
+                            fallback={
+                                <div className="mt-5 flex flex-col gap-5 ">
+                                    <Skeleton className="h-10 w-[800px]" />
+                                    <Skeleton className="h-4 w-[600px]" />
+                                    <Skeleton className="h-4 w-[550px]" />
+                                    <Skeleton className="h-4 w-[300px]" />
+                                </div>
+                            }
+                        >
+                            <ScrollArea className="mt-5 h-[432px] ">
+                                Coming soon
+                                {/* <CustomMDX source={notes.contentbody} /> */}
+                            </ScrollArea>
+                            <div className="mt-10 flex flex-row gap-5">
+                                <Button>
+                                    <FileTextIcon className="mr-2" /> Generate
+                                    Summary
+                                </Button>
+                                <Button variant={"secondary"}>
+                                    Regenerate Note{" "}
+                                    <SymbolIcon className="ml-2" />
+                                </Button>
+                            </div>
+                        </Suspense>
+                    ) : (
+                        <div className="mt-5 flex flex-col gap-5">
+                            <h1 className="text-3xl md:text-4xl">
+                                Content Not Found
+                            </h1>
+                            <p className="text-md text-muted-foreground">
+                                Worry not! Click the mystical 'Generate Content'
+                                button below, and watch as personalized notes
+                                magically materialize. It's like summoning your
+                                own army of knowledge imps, only less chaotic
+                                and with better grammar!
+                            </p>
+                            <form action={handleGenerateFlashCards}>
+                                <Button type="submit" className="max-w-fit">
+                                    Generate Content{" "}
+                                    <CookingPot className="ml-2 h-4 w-4" />
+                                </Button>
+                            </form>
+                        </div>
+                    )}
+                </TabsContent>
+            </Tabs>
         </div>
     ) : (
         <div className="mt-20 flex flex-col gap-5">
