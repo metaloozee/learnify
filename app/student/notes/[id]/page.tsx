@@ -1,12 +1,23 @@
+import { randomUUID } from "crypto"
 import { Suspense } from "react"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import Link from "next/link"
+import { env } from "@/env.mjs"
 import { ArrowLeftIcon, FileTextIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
-import { CookingPot, MoveLeft } from "lucide-react"
+import { CookingPot } from "lucide-react"
 
+import type { Database } from "@/types/supabase"
 import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -63,13 +74,56 @@ export default async function StudentNotesIndexPage({
     const handleGeneratePersonalizedNotes = async () => {
         "use server"
 
-        const supabase = await createServerActionClient({ cookies })
+        const supabase = await createServerActionClient<Database>({ cookies })
+    }
+
+    const handleGenerateSummary = async () => {
+        "use server"
+
+        const supabase = await createServerActionClient<Database>({ cookies })
+
+        try {
+            const res = await fetch(
+                "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
+                {
+                    headers: {
+                        Authorization: `Bearer ${env.HUGGINGFACE_API_KEY}`,
+                    },
+                    method: "POST",
+                    body: JSON.stringify(noteData?.notecontent),
+                }
+            )
+            if (!res.ok) {
+                throw new Error(
+                    "An error occurred while generating the summary."
+                )
+            }
+
+            const generatedSummary = await res.json()
+
+            const { error } = await supabase.from("generatedcontent").upsert({
+                contentid: summary?.contentid ?? randomUUID(),
+                contenttitle: `[SUMMARY] ${noteData?.notetitle}`,
+                contentbody: generatedSummary[0].summary_text,
+                contenttype: "summary",
+                noteid: noteData?.noteid,
+                studentid: session?.user.id,
+            })
+
+            if (error) {
+                throw new Error(error.message)
+            }
+        } catch (e: any) {
+            console.error(e)
+        } finally {
+            return revalidatePath(`/student/notes/${noteData?.noteid}`)
+        }
     }
 
     const handleGenerateFlashCards = async () => {
         "use server"
 
-        const supabase = await createServerActionClient({ cookies })
+        const supabase = await createServerActionClient<Database>({ cookies })
     }
 
     return session && studentData && noteData && subjectData ? (
@@ -111,16 +165,30 @@ export default async function StudentNotesIndexPage({
                             <ScrollArea className="mt-5 h-[432px] ">
                                 <CustomMDX source={notes.contentbody} />
                             </ScrollArea>
-                            <div className="mt-10 flex flex-row gap-5">
-                                <Button>
-                                    <FileTextIcon className="mr-2" /> Generate
-                                    Summary
-                                </Button>
-                                <Button variant={"secondary"}>
-                                    Regenerate Note{" "}
-                                    <SymbolIcon className="ml-2" />
-                                </Button>
+                            <div className="mt-10 flex flex-wrap flex-row gap-5">
+                                <form action={handleGenerateSummary}>
+                                    <Button disabled={!!summary} type="submit">
+                                        <FileTextIcon className="mr-2" />{" "}
+                                        Generate Summary
+                                    </Button>
+                                </form>
+                                <form action={handleGeneratePersonalizedNotes}>
+                                    <Button type="submit" variant={"secondary"}>
+                                        Regenerate Note{" "}
+                                        <SymbolIcon className="ml-2" />
+                                    </Button>
+                                </form>
                             </div>
+                            {summary && (
+                                <Card className="mt-10">
+                                    <CardHeader>
+                                        <CardTitle>Summary</CardTitle>
+                                        <CardDescription>
+                                            {summary.contentbody}
+                                        </CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            )}
                         </Suspense>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
@@ -160,14 +228,12 @@ export default async function StudentNotesIndexPage({
                                 {/* <CustomMDX source={notes.contentbody} /> */}
                             </ScrollArea>
                             <div className="mt-10 flex flex-row gap-5">
-                                <Button>
-                                    <FileTextIcon className="mr-2" /> Generate
-                                    Summary
-                                </Button>
-                                <Button variant={"secondary"}>
-                                    Regenerate Note{" "}
-                                    <SymbolIcon className="ml-2" />
-                                </Button>
+                                <form action={handleGenerateFlashCards}>
+                                    <Button type="submit" variant={"secondary"}>
+                                        Regenerate Cards{" "}
+                                        <SymbolIcon className="ml-2" />
+                                    </Button>
+                                </form>
                             </div>
                         </Suspense>
                     ) : (
