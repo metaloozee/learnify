@@ -12,7 +12,91 @@ import { ContentSchema } from "@/components/generate-content"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { accountSettingsFormSchema } from "@/components/settings-form"
 
-export const generateContent = async (
+export const generatePersonalizedFlashCards = async (
+    formData: z.infer<typeof ContentSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        console.log("generating flashcards lol")
+
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: `
+                            You are a Personal AI tutor and your student learns better using flashcards.
+                            Your job is to paraphrase the following note and generate flashcards for the important points in the following json format.
+                            The flashcards should either contain a single-line answer to a question or a single word answer to the question.
+
+                            [
+                                {
+                                    id: 1,
+                                    flashcard_title: "title which will be displayed on the cover",
+                                    flashcard_answer: "answer which will be displayed when the user clicks on the card"
+                                },
+                                {
+                                    id: 2,
+                                    flashcard_title: "title which will be displayed on the cover",
+                                    flashcard_answer: "answer which will be displayed when the user clicks on the card"
+                                }
+                            ]
+                        `,
+                    },
+                    {
+                        role: "user",
+                        content: formData.notecontent,
+                    },
+                ],
+            }),
+        })
+        if (!res.ok) {
+            throw new Error(res.statusText)
+        }
+
+        const generatedFlashCards = await res.json()
+
+        const { error } = await supabase.from("generatedcontent").upsert({
+            contentid: formData.contentid ?? randomUUID(),
+            contenttitle: `[FLASHCARD] ${formData.notetitle}`,
+            contentbody: generatedFlashCards.choices[0].message.content,
+            contenttype: "flash_cards",
+            noteid: formData.noteid,
+            studentid: session?.user.id,
+        })
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully generated Personalized Note.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/student/notes/${formData.noteid}`)
+    }
+}
+
+export const generatePersonalizedNote = async (
     formData: z.infer<typeof ContentSchema>
 ) => {
     const supabase = await createServerActionClient<Database>({ cookies })

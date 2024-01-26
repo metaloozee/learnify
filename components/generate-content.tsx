@@ -6,7 +6,10 @@ import { CookingPot } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { generateContent } from "@/lib/actions"
+import {
+    generatePersonalizedFlashCards,
+    generatePersonalizedNote,
+} from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -33,6 +36,7 @@ type GenerateContentProps = {
     note: Note
     content: Content | null
     studentid: string
+    type: "note" | "flashcard"
 }
 
 export const ContentSchema = z.object({
@@ -48,6 +52,7 @@ export const GenerateContentButton = ({
     note,
     content,
     studentid,
+    type,
 }: GenerateContentProps) => {
     const { toast } = useToast()
 
@@ -65,13 +70,25 @@ export const GenerateContentButton = ({
     return (
         <form
             onSubmit={form.handleSubmit(async (data) => {
-                await generateContent(data).then((value: any) => {
-                    return toast({
-                        title: value.title,
-                        description: value.description,
-                        variant: value.variant ?? "default",
-                    })
-                })
+                type === "note"
+                    ? await generatePersonalizedNote(data).then(
+                          (value: any) => {
+                              return toast({
+                                  title: value.title,
+                                  description: value.description,
+                                  variant: value.variant ?? "default",
+                              })
+                          }
+                      )
+                    : await generatePersonalizedFlashCards(data).then(
+                          (value: any) => {
+                              return toast({
+                                  title: value.title,
+                                  description: value.description,
+                                  variant: value.variant ?? "default",
+                              })
+                          }
+                      )
             })}
         >
             <input
