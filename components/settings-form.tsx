@@ -7,6 +7,7 @@ import { BookText, Presentation, RotateCw } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { updateUserSettings } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import {
@@ -21,7 +22,6 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/components/ui/use-toast"
 import type { UserData } from "@/components/navbar"
-import { updateUserSettings } from "@/app/actions"
 
 export const accountSettingsFormSchema = z.object({
     username: z.string().min(3).max(20),
