@@ -10,17 +10,10 @@ import { CookingPot } from "lucide-react"
 
 import type { Database } from "@/types/supabase"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { GenerateContentButton } from "@/components/generate-content"
 import { CustomMDX } from "@/components/mdx-remote"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
@@ -56,13 +49,8 @@ export default async function StudentNotesIndexPage({
         .from("generatedcontent")
         .select("*")
         .eq("noteid", noteData?.noteid ?? "")
+        .eq("studentid", studentData?.userid ?? "")
         .eq("contenttype", "note")
-        .maybeSingle()
-    const { data: summary } = await supabase
-        .from("generatedcontent")
-        .select("*")
-        .eq("noteid", noteData?.noteid ?? "")
-        .eq("contenttype", "summary")
         .maybeSingle()
     const { data: flashCards } = await supabase
         .from("generatedcontent")
@@ -70,61 +58,6 @@ export default async function StudentNotesIndexPage({
         .eq("noteid", noteData?.noteid ?? "")
         .eq("contenttype", "flash_cards")
         .maybeSingle()
-
-    const handleGeneratePersonalizedNotes = async () => {
-        "use server"
-
-        const supabase = await createServerActionClient<Database>({ cookies })
-    }
-
-    const handleGenerateSummary = async () => {
-        "use server"
-
-        const supabase = await createServerActionClient<Database>({ cookies })
-
-        try {
-            const res = await fetch(
-                "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
-                {
-                    headers: {
-                        Authorization: `Bearer ${env.HUGGINGFACE_API_KEY}`,
-                    },
-                    method: "POST",
-                    body: JSON.stringify(noteData?.notecontent),
-                }
-            )
-            if (!res.ok) {
-                throw new Error(
-                    "An error occurred while generating the summary."
-                )
-            }
-
-            const generatedSummary = await res.json()
-
-            const { error } = await supabase.from("generatedcontent").upsert({
-                contentid: summary?.contentid ?? randomUUID(),
-                contenttitle: `[SUMMARY] ${noteData?.notetitle}`,
-                contentbody: generatedSummary[0].summary_text,
-                contenttype: "summary",
-                noteid: noteData?.noteid,
-                studentid: session?.user.id,
-            })
-
-            if (error) {
-                throw new Error(error.message)
-            }
-        } catch (e: any) {
-            console.error(e)
-        } finally {
-            return revalidatePath(`/student/notes/${noteData?.noteid}`)
-        }
-    }
-
-    const handleGenerateFlashCards = async () => {
-        "use server"
-
-        const supabase = await createServerActionClient<Database>({ cookies })
-    }
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
@@ -166,29 +99,15 @@ export default async function StudentNotesIndexPage({
                                 <CustomMDX source={notes.contentbody} />
                             </ScrollArea>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
-                                <form action={handleGenerateSummary}>
-                                    <Button disabled={!!summary} type="submit">
-                                        <FileTextIcon className="mr-2" />{" "}
-                                        Generate Summary
-                                    </Button>
-                                </form>
-                                <form action={handleGeneratePersonalizedNotes}>
-                                    <Button type="submit" variant={"secondary"}>
-                                        Regenerate Note{" "}
-                                        <SymbolIcon className="ml-2" />
-                                    </Button>
-                                </form>
+                                <GenerateContentButton
+                                    note={noteData}
+                                    content={notes}
+                                    studentid={studentData.userid}
+                                >
+                                    Regenerate Note{" "}
+                                    <SymbolIcon className="ml-2" />
+                                </GenerateContentButton>
                             </div>
-                            {summary && (
-                                <Card className="mt-10">
-                                    <CardHeader>
-                                        <CardTitle>Summary</CardTitle>
-                                        <CardDescription>
-                                            {summary.contentbody}
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
-                            )}
                         </Suspense>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
@@ -202,12 +121,14 @@ export default async function StudentNotesIndexPage({
                                 own army of knowledge imps, only less chaotic
                                 and with better grammar!
                             </p>
-                            <form action={handleGeneratePersonalizedNotes}>
-                                <Button type="submit" className="max-w-fit">
-                                    Generate Content{" "}
-                                    <CookingPot className="ml-2 h-4 w-4" />
-                                </Button>
-                            </form>
+                            <GenerateContentButton
+                                note={noteData}
+                                content={notes}
+                                studentid={studentData.userid}
+                            >
+                                Generate Content{" "}
+                                <CookingPot className="ml-2 h-4 w-4" />
+                            </GenerateContentButton>
                         </div>
                     )}
                 </TabsContent>
@@ -227,14 +148,14 @@ export default async function StudentNotesIndexPage({
                                 Coming soon
                                 {/* <CustomMDX source={notes.contentbody} /> */}
                             </ScrollArea>
-                            <div className="mt-10 flex flex-row gap-5">
+                            {/* <div className="mt-10 flex flex-row gap-5">
                                 <form action={handleGenerateFlashCards}>
                                     <Button type="submit" variant={"secondary"}>
                                         Regenerate Cards{" "}
                                         <SymbolIcon className="ml-2" />
                                     </Button>
                                 </form>
-                            </div>
+                            </div> */}
                         </Suspense>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
@@ -248,12 +169,12 @@ export default async function StudentNotesIndexPage({
                                 own army of knowledge imps, only less chaotic
                                 and with better grammar!
                             </p>
-                            <form action={handleGenerateFlashCards}>
+                            {/* <form action={handleGenerateFlashCards}>
                                 <Button type="submit" className="max-w-fit">
                                     Generate Content{" "}
                                     <CookingPot className="ml-2 h-4 w-4" />
                                 </Button>
-                            </form>
+                            </form> */}
                         </div>
                     )}
                 </TabsContent>

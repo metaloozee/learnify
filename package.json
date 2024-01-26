@@ -15,6 +15,9 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
+    "@huggingface/agents": "^0.0.5",
+    "@huggingface/hub": "^0.13.0",
+    "@huggingface/inference": "^2.6.4",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
     "@next/mdx": "^14.1.0",
@@ -36,6 +39,7 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2.39.2",
     "@tanstack/react-table": "^8.11.6",
+    "@xenova/transformers": "^2.14.1",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
