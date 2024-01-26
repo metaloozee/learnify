@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
@@ -22,9 +21,9 @@ import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/components/ui/use-toast"
 import type { UserData } from "@/components/navbar"
-import { useSupabase } from "@/app/supabase-provider"
+import { updateUserSettings } from "@/app/actions"
 
-const accountSettingsFormSchema = z.object({
+export const accountSettingsFormSchema = z.object({
     username: z.string().min(3).max(20),
     email: z.string().email().optional(),
     first_name: z.string().min(2).max(50),
@@ -39,11 +38,7 @@ export const AccountSettingsForm = ({
     session: Session
     user: UserData
 }) => {
-    const router = useRouter()
     const { toast } = useToast()
-    const { supabase } = useSupabase()
-
-    const [loading, setLoading] = useState(false)
 
     const form = useForm<z.infer<typeof accountSettingsFormSchema>>({
         resolver: zodResolver(accountSettingsFormSchema),
@@ -56,67 +51,21 @@ export const AccountSettingsForm = ({
         },
     })
 
-    const onSubmit = async (
-        values: z.infer<typeof accountSettingsFormSchema>
-    ) => {
-        try {
-            setLoading(true)
-
-            const username = values.username.replace(/\s+/g, "").toLowerCase()
-
-            if (username !== user.username) {
-                const { data: existingUsername, error: existingUsernameError } =
-                    await supabase
-                        .from("users")
-                        .select("*")
-                        .eq("username", username)
-                        .maybeSingle()
-
-                if (existingUsername) {
-                    throw new Error(
-                        "There alreasy exists a user with that username."
-                    )
-                }
-                if (existingUsernameError) {
-                    throw new Error(existingUsernameError.message)
-                }
-            }
-
-            const { error: userUpdateError } = await supabase
-                .from("users")
-                .update({
-                    username: username,
-                    first_name: values.first_name,
-                    last_name: values.last_name,
-                })
-                .eq("userid", session.user.id)
-            if (userUpdateError) {
-                throw new Error(userUpdateError.message)
-            }
-
-            return toast({
-                title: "Success!",
-                description: "You have successfully updated yourself.",
-            })
-        } catch (err: any) {
-            console.error(err)
-
-            return toast({
-                title: "Oops! Something went wrong.",
-                description: err.message,
-                variant: "destructive",
-            })
-        } finally {
-            setLoading(false)
-            form.reset()
-            router.refresh()
-        }
-    }
-
     return (
         <div className="container border rounded-xl p-10 w-full">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                    onSubmit={form.handleSubmit(async (data) => {
+                        await updateUserSettings(data).then((value: any) => {
+                            return toast({
+                                title: value.title,
+                                description: value.description,
+                                variant: value.variant ?? "default",
+                            })
+                        })
+                        form.reset()
+                    })}
+                >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
                         <FormField
                             control={form.control}
@@ -260,7 +209,7 @@ export const AccountSettingsForm = ({
                         />
                     </div>
                     <div className="w-full mt-10">
-                        {loading ? (
+                        {form.formState.isSubmitting ? (
                             <Button className="w-full" disabled type="submit">
                                 <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                 Please Wait
