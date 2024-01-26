@@ -72,9 +72,13 @@ export default async function StudentNotesIndexPage({
             </Button>
             <Tabs className="mt-10" defaultValue="note">
                 <TabsList>
-                    <TabsTrigger value="note">Personalized Note</TabsTrigger>
-                    <TabsTrigger value="flash_cards">Flash Cards</TabsTrigger>
-                    <TabsTrigger disabled value="mini_quiz">
+                    <TabsTrigger className="text-xs" value="note">
+                        Personalized Note
+                    </TabsTrigger>
+                    <TabsTrigger className="text-xs" value="flash_cards">
+                        Flash Cards
+                    </TabsTrigger>
+                    <TabsTrigger className="text-xs" disabled value="mini_quiz">
                         Mini Quiz
                     </TabsTrigger>
                 </TabsList>
