@@ -7,6 +7,7 @@ import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
+import { onboardFormSchema } from "@/components/onboard-form"
 import { accountSettingsFormSchema } from "@/components/settings-form"
 
 export const updateUserSettings = async (
@@ -68,5 +69,58 @@ export const updateUserSettings = async (
         }
     } finally {
         revalidatePath("/account")
+    }
+}
+
+export const createUser = async (
+    formData: z.infer<typeof onboardFormSchema>
+) => {
+    const supabase = await createServerActionClient({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        const username = formData.username.replace(/\s+/g, "").toLowerCase()
+
+        const { data: existingUsername, error: existingUsernameError } =
+            await supabase
+                .from("users")
+                .select("*")
+                .eq("username", username)
+                .maybeSingle()
+
+        if (existingUsername) {
+            throw new Error("There alreasy exists a user with that username.")
+        }
+        if (existingUsernameError) {
+            throw new Error(existingUsernameError.message)
+        }
+
+        const { error: userError } = await supabase.from("users").insert({
+            userid: session?.user.id,
+            username: username,
+            usertype: formData.type,
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+        })
+        if (userError) {
+            throw new Error(userError.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "You have successfully updated yourself.",
+        }
+    } catch (e: any) {
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath("/onboarding")
     }
 }

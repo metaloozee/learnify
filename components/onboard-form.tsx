@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
 import { BookText, Presentation, RotateCw } from "lucide-react"
@@ -21,9 +20,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/components/ui/use-toast"
-import { useSupabase } from "@/app/supabase-provider"
+import { createUser } from "@/app/actions"
 
-const onboardFormSchema = z.object({
+export const onboardFormSchema = z.object({
     username: z.string().min(3).max(20),
     email: z.string().email().optional(),
     first_name: z.string().min(2).max(50),
@@ -32,11 +31,7 @@ const onboardFormSchema = z.object({
 })
 
 export const OnboardForm = ({ session }: { session: Session }) => {
-    const router = useRouter()
     const { toast } = useToast()
-    const { supabase } = useSupabase()
-
-    const [loading, setLoading] = useState(false)
 
     const form = useForm<z.infer<typeof onboardFormSchema>>({
         resolver: zodResolver(onboardFormSchema),
@@ -46,62 +41,22 @@ export const OnboardForm = ({ session }: { session: Session }) => {
         },
     })
 
-    const onSubmit = async (values: z.infer<typeof onboardFormSchema>) => {
-        try {
-            setLoading(true)
-
-            const username = values.username.replace(/\s+/g, "").toLowerCase()
-
-            const { data: existingUsername, error: existingUsernameError } =
-                await supabase
-                    .from("users")
-                    .select("*")
-                    .eq("username", username)
-                    .maybeSingle()
-
-            if (existingUsername) {
-                throw new Error(
-                    "There alreasy exists a user with that username."
-                )
-            }
-            if (existingUsernameError) {
-                throw new Error(existingUsernameError.message)
-            }
-
-            const { error: userError } = await supabase.from("users").insert({
-                userid: session.user.id,
-                username: username,
-                usertype: values.type,
-                first_name: values.first_name,
-                last_name: values.last_name,
-            })
-            if (userError) {
-                throw new Error(userError.message)
-            }
-
-            return toast({
-                title: "Success!",
-                description: "You have successfully registered yourself.",
-            })
-        } catch (e: any) {
-            console.error(e)
-
-            return toast({
-                title: "Oops! Something went wrong.",
-                description: e.message,
-                variant: "destructive",
-            })
-        } finally {
-            setLoading(false)
-            form.reset()
-            router.push("/")
-        }
-    }
-
     return (
         <div className="container border rounded-xl p-10">
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                    onSubmit={form.handleSubmit(async (data) => {
+                        await createUser(data).then((value: any) => {
+                            return toast({
+                                title: value.title,
+                                description: value.description,
+                                variant: value.variant ?? "default",
+                            })
+                        })
+                        form.reset()
+                        redirect("/")
+                    })}
+                >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
                         <FormField
                             control={form.control}
@@ -247,7 +202,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
                         />
                     </div>
                     <div className="w-full mt-10">
-                        {loading ? (
+                        {form.formState.isSubmitting ? (
                             <Button className="w-full" disabled type="submit">
                                 <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                 Please Wait
