@@ -1,10 +1,9 @@
 "use client"
 
 import React from "react"
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
-import { RotateCw } from "lucide-react"
+import { BookCheck, RotateCw, Save } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -51,7 +50,6 @@ export const TeacherPlayground = ({
     subject,
     note,
 }: TeacherPlaygroundProps) => {
-    const router = useRouter()
     const { supabase } = useSupabase()
     const { toast } = useToast()
 
@@ -79,7 +77,7 @@ export const TeacherPlayground = ({
         },
     })
 
-    const onSubmit = async (
+    const onSave = async (
         values: z.infer<typeof TeacherPlaygroundFormSchema>
     ) => {
         try {
@@ -98,7 +96,44 @@ export const TeacherPlayground = ({
 
             return toast({
                 title: "Success!",
-                description: "You have successfullt updated the notes.",
+                description: "You have successfully updated the note.",
+            })
+        } catch (e: any) {
+            console.error(e)
+
+            form.reset()
+
+            return toast({
+                title: "Oops! Something went wrong.",
+                description: e.message,
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const onSubmit = async (
+        values: z.infer<typeof TeacherPlaygroundFormSchema>
+    ) => {
+        try {
+            setLoading(true)
+
+            const { error } = await supabase
+                .from("notes")
+                .update({
+                    notetitle: values.title,
+                    notecontent: values.content,
+                    is_published: true,
+                })
+                .eq("noteid", note.noteid)
+            if (error) {
+                throw new Error(error.message)
+            }
+
+            return toast({
+                title: "Success!",
+                description: "You have successfully published the note.",
             })
         } catch (e: any) {
             console.error(e)
@@ -185,20 +220,35 @@ export const TeacherPlayground = ({
                                     )}
                                 />
                             </div>
-                            {loading ? (
-                                <Button
-                                    className="w-full"
-                                    disabled
-                                    type="submit"
-                                >
-                                    <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                                    Please Wait
-                                </Button>
-                            ) : (
-                                <Button className="w-full" type="submit">
-                                    Submit
-                                </Button>
-                            )}
+                            <div className="flex flex-col gap-2 md:gap-5">
+                                {note.is_published ? (
+                                    <></>
+                                ) : (
+                                    <Button
+                                        className="w-full"
+                                        type="submit"
+                                        variant={"secondary"}
+                                    >
+                                        <BookCheck className="mr-2 h-4 w-4" />
+                                        Publish
+                                    </Button>
+                                )}
+                                {loading ? (
+                                    <Button className="w-full" disabled>
+                                        <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                                        Please Wait
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        className="w-full"
+                                        type="submit"
+                                        onClick={form.handleSubmit(onSave)}
+                                    >
+                                        <Save className="mr-2 h-4 w-4" />
+                                        Save
+                                    </Button>
+                                )}
+                            </div>
                         </ResizablePanel>
                     </ResizablePanelGroup>
                 ) : (

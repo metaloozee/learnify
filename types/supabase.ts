@@ -77,6 +77,7 @@ export interface Database {
             }
             notes: {
                 Row: {
+                    is_published: boolean
                     notecontent: string
                     noteid: string
                     notetitle: string
@@ -85,6 +86,7 @@ export interface Database {
                     updated_at: string | null
                 }
                 Insert: {
+                    is_published?: boolean
                     notecontent: string
                     noteid?: string
                     notetitle: string
@@ -93,6 +95,7 @@ export interface Database {
                     updated_at?: string | null
                 }
                 Update: {
+                    is_published?: boolean
                     notecontent?: string
                     noteid?: string
                     notetitle?: string

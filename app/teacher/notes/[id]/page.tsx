@@ -4,10 +4,12 @@ import { TeacherPlayground } from "@/components/teacher-playground"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export type NoteData = {
+    is_published: boolean
     notecontent: string
     noteid: string
     notetitle: string
     subjectid: string | null
+    teacherid: string | null
     updated_at: string | null
 }
 
