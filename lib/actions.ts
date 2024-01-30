@@ -8,9 +8,55 @@ import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
+import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { accountSettingsFormSchema } from "@/components/settings-form"
+
+export const createNewSubject = async (
+    formData: z.infer<typeof subjectFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+    const { data: userData } = await supabase
+        .from("users")
+        .select("userid")
+        .eq("userid", session?.user.id ?? "")
+        .eq("usertype", "teacher")
+        .maybeSingle()
+
+    try {
+        if (!userData) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase.from("subjects").insert({
+            subjectname: formData.subjectname,
+            description: formData.subjectdescription,
+            teacherid: userData.userid,
+        })
+        if (error) {
+            throw new Error(error.message)
+        }
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully created Subject.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath("/teacher")
+    }
+}
 
 export const generatePersonalizedFlashCards = async (
     formData: z.infer<typeof ContentSchema>
@@ -21,8 +67,6 @@ export const generatePersonalizedFlashCards = async (
     } = await supabase.auth.getSession()
 
     try {
-        console.log("generating flashcards lol")
-
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
             headers: {
                 Authorization: `Bearer ${env.OPENAI_API_KEY}`,

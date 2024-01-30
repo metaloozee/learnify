@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { PlusSquare } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { CreateSubjectButton } from "@/components/create-subject-btn"
 import { SkeletonCard, TeacherSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
@@ -41,9 +42,7 @@ export default async function TeacherIndexPage() {
                 designed specifically for you. Click on the subject cards below
                 to initiate your exploration.
             </p>
-            <Button variant={"default"} className="max-w-fit shadow-xl">
-                <PlusSquare className="mr-2 h-4 w-4" /> Create Subject
-            </Button>
+            <CreateSubjectButton />
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
                 <Suspense
