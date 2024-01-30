@@ -7,7 +7,6 @@ import { BookCheck, RotateCw, Save } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -130,6 +129,9 @@ export const TeacherPlayground = ({
             if (error) {
                 throw new Error(error.message)
             }
+
+            console.log("sendind email")
+            await fetch("/api/send")
 
             return toast({
                 title: "Success!",
