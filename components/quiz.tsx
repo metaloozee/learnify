@@ -1,95 +1,110 @@
 "use client"
 
-import * as React from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SendHorizonal } from "lucide-react"
-import { useForm } from "react-hook-form"
+import React, { useState } from "react"
+import { GraduationCap, RotateCw } from "lucide-react"
 import * as z from "zod"
 
+import { evaluateQuizAnswer } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
 
 export type QuizProps = {
     contentid: string
     studentid: string
-    contentbody: string
     noteid: string
+    quiz: {
+        id: number
+        question: string
+        answer: string
+    }[]
 }
 
-export const QuizSchema = z.object({
-    question: z.string(),
-    answer: z.string(),
-    submittedAnswer: z.string().min(5),
-})
-
-export const Quiz = ({
-    question,
-    answer,
-}: {
-    question: string
-    answer: string
-}) => {
-    const form = useForm<z.infer<typeof QuizSchema>>({
-        resolver: zodResolver(QuizSchema),
-        defaultValues: {
-            question,
-            answer,
-        },
+export const QuizSchema = z
+    .object({
+        id: z.number(),
+        question: z.string(),
+        originalAnswer: z.string(),
+        submittedAnswer: z.string().min(5).optional(),
     })
+    .array()
 
-    const evaluateForm = async (values: z.infer<typeof QuizSchema>) => {
-        const accuracy = new RegExp(`\\b${values.answer}\\b`, "i").test(
-            values.submittedAnswer
-        )
+export const Quiz: React.FC<{ quiz: QuizProps }> = ({ quiz }) => {
+    const { toast } = useToast()
 
-        console.log(accuracy)
+    const [submittedAnswers, setSubmittedAnswers] = useState<
+        z.infer<typeof QuizSchema>
+    >([])
+    const [loading, setLoading] = useState(false)
+
+    const handleAnswerChange = (index: number, value: string) => {
+        setSubmittedAnswers((prevAnswers) => {
+            const newAnswers = [...prevAnswers]
+            newAnswers[index] = { ...newAnswers[index], submittedAnswer: value }
+            return newAnswers
+        })
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(evaluateForm)}>
-                <Card>
+        <form
+            onSubmit={async (e: React.FormEvent) => {
+                e.preventDefault()
+                setLoading(true)
+
+                const mappedAnswers = submittedAnswers.map(
+                    (submittedAnswer, index) => {
+                        const { id, question, answer } = quiz.quiz[index]
+                        return {
+                            id,
+                            question,
+                            originalAnswer: answer,
+                            submittedAnswer:
+                                submittedAnswer?.submittedAnswer || "",
+                        }
+                    }
+                )
+
+                await evaluateQuizAnswer(mappedAnswers).then((value: any) => {
+                    setLoading(false)
+                    return toast({
+                        title: value.title,
+                        description: value.description,
+                        variant: value.variant ?? "default",
+                    })
+                })
+            }}
+            className="border p-4 rounded-xl w-full grid grid-cols-1 md:grid-cols-2 gap-5"
+        >
+            {quiz.quiz.map((q, index) => (
+                <Card key={index}>
                     <CardHeader>
-                        <CardTitle>{question}</CardTitle>
+                        <CardTitle>{q.question}</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex gap-5 w-full">
-                        <FormField
-                            control={form.control}
-                            name="submittedAnswer"
-                            render={({ field }) => (
-                                <FormItem className="w-full">
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Your Answer Goes Here.."
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
+                    <CardContent className="flex flex-wrap gap-5 w-full">
+                        <Input
+                            placeholder="Your answer..."
+                            value={
+                                submittedAnswers[index]?.submittedAnswer || ""
+                            }
+                            onChange={(e) =>
+                                handleAnswerChange(index, e.target.value)
+                            }
                         />
-                        <Button type="submit" variant={"outline"}>
-                            <SendHorizonal className="h-3 w-3" />
-                        </Button>
                     </CardContent>
                 </Card>
-            </form>
-        </Form>
+            ))}
+            {loading ? (
+                <Button className="col-span-2" disabled type="submit">
+                    <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                    Please Wait
+                </Button>
+            ) : (
+                <Button className="col-span-2" type="submit">
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    Hit Me with that Score
+                </Button>
+            )}
+        </form>
     )
 }

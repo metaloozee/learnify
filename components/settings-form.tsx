@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Session } from "@supabase/supabase-js"
 import { BookText, Presentation, RotateCw } from "lucide-react"

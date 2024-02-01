@@ -38,6 +38,7 @@ type GenerateContentProps = {
     content: Content | null
     studentid: string
     type: "note" | "flashcard" | "quiz"
+    regenerate?: true
 }
 
 export const ContentSchema = z.object({
@@ -54,6 +55,7 @@ export const GenerateContentButton = ({
     content,
     studentid,
     type,
+    regenerate,
 }: GenerateContentProps) => {
     const { toast } = useToast()
 
@@ -135,7 +137,9 @@ export const GenerateContentButton = ({
                     </span>
                 </Button>
             ) : (
-                <Button type="submit">{children}</Button>
+                <Button variant={regenerate && "secondary"} type="submit">
+                    {children}
+                </Button>
             )}
         </form>
     )

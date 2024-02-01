@@ -11,6 +11,7 @@ import { Database } from "@/types/supabase"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
 import { onboardFormSchema } from "@/components/onboard-form"
+import { QuizSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
 
 export const createNewSubject = async (
@@ -58,6 +59,70 @@ export const createNewSubject = async (
     }
 }
 
+export const evaluateQuizAnswer = async (
+    formData: z.infer<typeof QuizSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: `
+                            You are a Personal AI tutor and your student learns better using mini-quiz.
+                            You already gave one of your student a Quiz to solve, and they did solve it but rather than grading them tradiotionally your job is to see if your student understood the question or not.
+                            You need to find the accuracy of the answer submitted by him and accordingly grade him below 1.
+                            The data of the quiz will be provided to you, the question denotes the original question asked; the answer is the correct answer to that question; the submittedanswer is the answer submitted by your student.
+                            Depending on the number of questions you are supposed to respond with [score]/[number of questions].
+                            NOTE: You are not supposed to give 1 even if the answer is 100% correct.
+                        `,
+                    },
+                    {
+                        role: "user",
+                        content: JSON.stringify(formData),
+                    },
+                ],
+            }),
+        })
+        if (!res.ok) {
+            throw new Error(res.statusText)
+        }
+
+        const response = await res.json()
+        console.log(response.choices[0].message.content)
+        return {
+            status: "ok",
+            title: "Success!",
+            description: `Your score is ${response.choices[0].message.content}`,
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/student/notes/*`)
+    }
+}
+
 export const generatePersonalizedMiniQuiz = async (
     formData: z.infer<typeof ContentSchema>
 ) => {
@@ -67,6 +132,10 @@ export const generatePersonalizedMiniQuiz = async (
     } = await supabase.auth.getSession()
 
     try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
             headers: {
                 Authorization: `Bearer ${env.OPENAI_API_KEY}`,
@@ -74,7 +143,7 @@ export const generatePersonalizedMiniQuiz = async (
             },
             method: "POST",
             body: JSON.stringify({
-                mode: "gpt-3.5-turbo",
+                model: "gpt-3.5-turbo",
                 messages: [
                     {
                         role: "system",
@@ -150,6 +219,10 @@ export const generatePersonalizedFlashCards = async (
     } = await supabase.auth.getSession()
 
     try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
             headers: {
                 Authorization: `Bearer ${env.OPENAI_API_KEY}`,
@@ -232,6 +305,10 @@ export const generatePersonalizedNote = async (
     } = await supabase.auth.getSession()
 
     try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
         const res = await fetch("https://api.openai.com/v1/chat/completions", {
             headers: {
                 Authorization: `Bearer ${env.OPENAI_API_KEY}`,
@@ -305,6 +382,10 @@ export const updateUserSettings = async (
         .single()
 
     try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
         const username = formData.username.replace(/\s+/g, "").toLowerCase()
 
         if (username !== user?.username) {
@@ -362,6 +443,10 @@ export const createUser = async (
     } = await supabase.auth.getSession()
 
     try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
         const username = formData.username.replace(/\s+/g, "").toLowerCase()
 
         const { data: existingUsername, error: existingUsernameError } =

@@ -134,6 +134,7 @@ export default async function StudentNotesIndexPage({
                                 content={notes}
                                 studentid={studentData.userid}
                                 type="note"
+                                regenerate
                             >
                                 Generate Content{" "}
                                 <CookingPot className="ml-2 h-4 w-4" />
@@ -170,6 +171,7 @@ export default async function StudentNotesIndexPage({
                                     content={flashCards}
                                     studentid={studentData.userid}
                                     type="flashcard"
+                                    regenerate
                                 >
                                     Regenerate Cards{" "}
                                     <SymbolIcon className="ml-2" />
@@ -212,14 +214,24 @@ export default async function StudentNotesIndexPage({
                                 </div>
                             }
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-                                {JSON.parse(quiz.contentbody).map((q: any) => (
+                            <div className="w-full mt-5">
+                                <Quiz
+                                    quiz={
+                                        {
+                                            quiz: JSON.parse(quiz.contentbody),
+                                            noteid: noteData.noteid,
+                                            contentid: quiz.contentid,
+                                            studentid: studentData.userid,
+                                        } as QuizProps
+                                    }
+                                />
+                                {/* {JSON.parse(quiz.contentbody).map((q: any) => (
                                     <Quiz
                                         key={q.id}
                                         question={q.question}
                                         answer={q.answer}
                                     />
-                                ))}
+                                ))} */}
                             </div>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
                                 <GenerateContentButton
@@ -227,6 +239,7 @@ export default async function StudentNotesIndexPage({
                                     content={quiz}
                                     studentid={studentData.userid}
                                     type="quiz"
+                                    regenerate
                                 >
                                     Regenerate Quiz{" "}
                                     <SymbolIcon className="ml-2" />
@@ -249,7 +262,7 @@ export default async function StudentNotesIndexPage({
                                 note={noteData}
                                 content={flashCards}
                                 studentid={studentData.userid}
-                                type="flashcard"
+                                type="quiz"
                             >
                                 Generate Content{" "}
                                 <CookingPot className="ml-2 h-4 w-4" />
