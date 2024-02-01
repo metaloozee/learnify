@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FlashCard } from "@/components/flashcard"
 import { GenerateContentButton } from "@/components/generate-content"
 import { CustomMDX } from "@/components/mdx-remote"
+import { Quiz, type QuizProps } from "@/components/quiz"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function StudentNotesIndexPage({
@@ -53,6 +54,13 @@ export default async function StudentNotesIndexPage({
         .eq("noteid", noteData?.noteid ?? "")
         .eq("contenttype", "flash_cards")
         .maybeSingle()
+    const { data: quiz } = await supabase
+        .from("generatedcontent")
+        .select("*")
+        .eq("noteid", noteData?.noteid ?? "")
+        .eq("studentid", studentData?.userid ?? "")
+        .eq("contenttype", "quiz")
+        .maybeSingle()
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
@@ -70,7 +78,7 @@ export default async function StudentNotesIndexPage({
                     nevermind
                 </Link>
             </Button>
-            <Tabs className="mt-10" defaultValue="note">
+            <Tabs className="mt-10" defaultValue="mini_quiz">
                 <TabsList>
                     <TabsTrigger className="text-xs" value="note">
                         Personalized Note
@@ -78,7 +86,7 @@ export default async function StudentNotesIndexPage({
                     <TabsTrigger className="text-xs" value="flash_cards">
                         Flash Cards
                     </TabsTrigger>
-                    <TabsTrigger className="text-xs" disabled value="mini_quiz">
+                    <TabsTrigger className="text-xs" value="mini_quiz">
                         Mini Quiz
                     </TabsTrigger>
                 </TabsList>
@@ -163,7 +171,64 @@ export default async function StudentNotesIndexPage({
                                     studentid={studentData.userid}
                                     type="flashcard"
                                 >
-                                    Regenerate Note{" "}
+                                    Regenerate Cards{" "}
+                                    <SymbolIcon className="ml-2" />
+                                </GenerateContentButton>
+                            </div>
+                        </Suspense>
+                    ) : (
+                        <div className="mt-5 flex flex-col gap-5">
+                            <h1 className="text-3xl md:text-4xl">
+                                Content Not Found
+                            </h1>
+                            <p className="text-md text-muted-foreground">
+                                Worry not! Click the mystical 'Generate Content'
+                                button below, and watch as personalized notes
+                                magically materialize. It's like summoning your
+                                own army of knowledge imps, only less chaotic
+                                and with better grammar!
+                            </p>
+                            <GenerateContentButton
+                                note={noteData}
+                                content={flashCards}
+                                studentid={studentData.userid}
+                                type="flashcard"
+                            >
+                                Generate Content{" "}
+                                <CookingPot className="ml-2 h-4 w-4" />
+                            </GenerateContentButton>
+                        </div>
+                    )}
+                </TabsContent>
+                <TabsContent value="mini_quiz">
+                    {quiz ? (
+                        <Suspense
+                            fallback={
+                                <div className="mt-5 flex flex-col gap-5 ">
+                                    <Skeleton className="h-10 w-[800px]" />
+                                    <Skeleton className="h-4 w-[600px]" />
+                                    <Skeleton className="h-4 w-[550px]" />
+                                    <Skeleton className="h-4 w-[300px]" />
+                                </div>
+                            }
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                                {JSON.parse(quiz.contentbody).map((q: any) => (
+                                    <Quiz
+                                        key={q.id}
+                                        question={q.question}
+                                        answer={q.answer}
+                                    />
+                                ))}
+                            </div>
+                            <div className="mt-10 flex flex-wrap flex-row gap-5">
+                                <GenerateContentButton
+                                    note={noteData}
+                                    content={quiz}
+                                    studentid={studentData.userid}
+                                    type="quiz"
+                                >
+                                    Regenerate Quiz{" "}
                                     <SymbolIcon className="ml-2" />
                                 </GenerateContentButton>
                             </div>

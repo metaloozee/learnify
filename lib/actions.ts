@@ -58,6 +58,89 @@ export const createNewSubject = async (
     }
 }
 
+export const generatePersonalizedMiniQuiz = async (
+    formData: z.infer<typeof ContentSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            method: "POST",
+            body: JSON.stringify({
+                mode: "gpt-3.5-turbo",
+                messages: [
+                    {
+                        role: "system",
+                        content: `
+                            You are a Personal AI tutor and your student learns better using mini-quiz.
+                            Your job is to paraphrase the following note and generate a mini-quiz for the important points in the following json format.
+                            The quiz should either contain a single-line answer to a question or a single word answer to the question.
+                            Provide minimum 10 questions
+
+                            [
+                                {
+                                    id: 1,
+                                    question: "question which will be displayed to the user",
+                                    answer: "answer to the question"
+                                },
+                                {
+                                    id: 2,
+                                    question: "question which will be displayed to the user",
+                                    answer: "answer to the question"
+                                }
+                            ]
+                        `,
+                    },
+                    {
+                        role: "user",
+                        content: formData.notecontent,
+                    },
+                ],
+            }),
+        })
+        if (!res.ok) {
+            throw new Error(res.statusText)
+        }
+
+        const generatedQuiz = await res.json()
+
+        const { error } = await supabase.from("generatedcontent").upsert({
+            contentid: formData.contentid ?? randomUUID(),
+            contenttitle: `[QUIZ] ${formData.notetitle}`,
+            contentbody: generatedQuiz.choices[0].message.content,
+            contenttype: "quiz",
+            noteid: formData.noteid,
+            studentid: session?.user.id,
+        })
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully generated Personalized Quiz.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/student/notes/${formData.noteid}`)
+    }
+}
+
 export const generatePersonalizedFlashCards = async (
     formData: z.infer<typeof ContentSchema>
 ) => {

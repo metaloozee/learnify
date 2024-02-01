@@ -8,6 +8,7 @@ import * as z from "zod"
 
 import {
     generatePersonalizedFlashCards,
+    generatePersonalizedMiniQuiz,
     generatePersonalizedNote,
 } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
@@ -36,7 +37,7 @@ type GenerateContentProps = {
     note: Note
     content: Content | null
     studentid: string
-    type: "note" | "flashcard"
+    type: "note" | "flashcard" | "quiz"
 }
 
 export const ContentSchema = z.object({
@@ -80,7 +81,17 @@ export const GenerateContentButton = ({
                               })
                           }
                       )
-                    : await generatePersonalizedFlashCards(data).then(
+                    : type === "flashcard"
+                    ? await generatePersonalizedFlashCards(data).then(
+                          (value: any) => {
+                              return toast({
+                                  title: value.title,
+                                  description: value.description,
+                                  variant: value.variant ?? "default",
+                              })
+                          }
+                      )
+                    : await generatePersonalizedMiniQuiz(data).then(
                           (value: any) => {
                               return toast({
                                   title: value.title,
