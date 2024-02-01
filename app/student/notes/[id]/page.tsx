@@ -186,7 +186,8 @@ export default async function StudentNotesIndexPage({
                                 studentid={studentData.userid}
                                 type="flashcard"
                             >
-                                Regenerate Note <SymbolIcon className="ml-2" />
+                                Generate Content{" "}
+                                <CookingPot className="ml-2 h-4 w-4" />
                             </GenerateContentButton>
                         </div>
                     )}
