@@ -1,7 +1,9 @@
 "use client"
 
 import React, { useState } from "react"
-import { GraduationCap, RotateCw } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Check, GraduationCap, RotateCw, Send } from "lucide-react"
+import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { evaluateQuizAnswer } from "@/lib/actions"
@@ -11,100 +13,74 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 
 export type QuizProps = {
-    contentid: string
-    studentid: string
+    answer: string
+    answer_embedding: string
+    id: string
     noteid: string
-    quiz: {
-        id: number
-        question: string
-        answer: string
-    }[]
+    question: string
+    question_embedding: string
+    studentid: string
+    graded: boolean | null
 }
 
-export const QuizSchema = z
-    .object({
-        id: z.number(),
-        question: z.string(),
-        originalAnswer: z.string(),
-        submittedAnswer: z.string().min(5).optional(),
-    })
-    .array()
+export const QuizFormSchema = z.object({
+    id: z.string(),
+    question: z.string(),
+    answer: z.string(),
+    submittedAnswer: z.string(),
+})
 
-export const Quiz: React.FC<{ quiz: QuizProps }> = ({ quiz }) => {
+export const Quiz = ({ quiz }: { quiz: QuizProps }) => {
     const { toast } = useToast()
 
-    const [submittedAnswers, setSubmittedAnswers] = useState<
-        z.infer<typeof QuizSchema>
-    >([])
-    const [loading, setLoading] = useState(false)
-
-    const handleAnswerChange = (index: number, value: string) => {
-        setSubmittedAnswers((prevAnswers) => {
-            const newAnswers = [...prevAnswers]
-            newAnswers[index] = { ...newAnswers[index], submittedAnswer: value }
-            return newAnswers
-        })
-    }
+    const form = useForm<z.infer<typeof QuizFormSchema>>({
+        resolver: zodResolver(QuizFormSchema),
+        defaultValues: {
+            id: quiz.id,
+            question: quiz.question,
+            answer: quiz.answer,
+        },
+    })
 
     return (
         <form
-            onSubmit={async (e: React.FormEvent) => {
-                e.preventDefault()
-                setLoading(true)
-
-                const mappedAnswers = submittedAnswers.map(
-                    (submittedAnswer, index) => {
-                        const { id, question, answer } = quiz.quiz[index]
-                        return {
-                            id,
-                            question,
-                            originalAnswer: answer,
-                            submittedAnswer:
-                                submittedAnswer?.submittedAnswer || "",
-                        }
-                    }
-                )
-
-                await evaluateQuizAnswer(mappedAnswers).then((value: any) => {
-                    setLoading(false)
+            onSubmit={form.handleSubmit(async (data) => {
+                await evaluateQuizAnswer(data).then((value: any) => {
                     return toast({
                         title: value.title,
                         description: value.description,
                         variant: value.variant ?? "default",
                     })
                 })
-            }}
-            className="border p-4 rounded-xl w-full grid grid-cols-1 md:grid-cols-2 gap-5"
+            })}
         >
-            {quiz.quiz.map((q, index) => (
-                <Card key={index}>
-                    <CardHeader>
-                        <CardTitle>{q.question}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-wrap gap-5 w-full">
-                        <Input
-                            placeholder="Your answer..."
-                            value={
-                                submittedAnswers[index]?.submittedAnswer || ""
-                            }
-                            onChange={(e) =>
-                                handleAnswerChange(index, e.target.value)
-                            }
-                        />
-                    </CardContent>
-                </Card>
-            ))}
-            {loading ? (
-                <Button className="col-span-2" disabled type="submit">
-                    <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                    Please Wait
-                </Button>
-            ) : (
-                <Button className="col-span-2" type="submit">
-                    <GraduationCap className="mr-2 h-4 w-4" />
-                    Hit Me with that Score
-                </Button>
-            )}
+            <Card>
+                <CardHeader>
+                    <CardTitle>{quiz.question}</CardTitle>
+                </CardHeader>
+                <CardContent className="flex gap-5 w-full">
+                    <Input
+                        placeholder="Your answer..."
+                        disabled={quiz.graded ?? false}
+                        defaultValue={quiz.graded ? quiz.answer : undefined}
+                        {...form.register("submittedAnswer")}
+                    />
+
+                    {quiz.graded ? (
+                        <Button variant={"outline"} disabled type="submit">
+                            <Check className="h-4 w-4" />
+                        </Button>
+                    ) : form.formState.isSubmitting ? (
+                        <Button variant={"outline"} disabled type="submit">
+                            <RotateCw className="h-4 w-4 animate-spin" />
+                        </Button>
+                    ) : (
+                        <Button variant={"outline"} type="submit">
+                            <Send className="h-4 w-4" />
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
         </form>
     )
 }

@@ -212,17 +212,12 @@ export default async function StudentNotesIndexPage({
                                 </div>
                             }
                         >
-                            <div className="w-full mt-5">
-                                {/* <Quiz
-                                    quiz={
-                                        {
-                                            quiz: JSON.parse(quiz.contentbody),
-                                            noteid: noteData.noteid,
-                                            contentid: quiz.contentid,
-                                            studentid: studentData.userid,
-                                        } as QuizProps
-                                    }
-                                /> */}
+                            <div className="w-full mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {quiz.map(
+                                    (q: (typeof quiz)[0], index: number) => (
+                                        <Quiz key={index} quiz={q} />
+                                    )
+                                )}
                             </div>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
                                 <GenerateContentButton

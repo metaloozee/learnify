@@ -5,13 +5,14 @@ import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { env } from "@/env.mjs"
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
+import { all, create } from "mathjs"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
 import { onboardFormSchema } from "@/components/onboard-form"
-import { QuizSchema } from "@/components/quiz"
+import { QuizFormSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
 
 export const createNewSubject = async (
@@ -60,54 +61,67 @@ export const createNewSubject = async (
 }
 
 export const evaluateQuizAnswer = async (
-    formData: z.infer<typeof QuizSchema>
+    formData: z.infer<typeof QuizFormSchema>
 ) => {
+    const math = create(all, {})
+
     const supabase = await createServerActionClient<Database>({ cookies })
     const {
         data: { session },
     } = await supabase.auth.getSession()
+    const { data: quizData } = await supabase
+        .from("qna")
+        .select("answer_embedding, id")
+        .eq("id", formData.id)
+        .single()
 
     try {
         if (!session) {
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        if (!quizData) {
+            throw new Error("Invalid quiz")
+        }
+
+        const res = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
             headers: {
                 Authorization: `Bearer ${env.OPENAI_API_KEY}`,
                 "Content-Type": "application/json",
             },
-            method: "POST",
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [
-                    {
-                        role: "system",
-                        content: `
-                            You are a Personal AI tutor and your student learns better using mini-quiz.
-                            You already gave one of your student a Quiz to solve, and they did solve it but rather than grading them tradiotionally your job is to see if your student understood the question or not.
-                            You need to find the accuracy of the answer submitted by him and accordingly grade him below 1.
-                            The data of the quiz will be provided to you, the question denotes the original question asked; the answer is the correct answer to that question; the submittedanswer is the answer submitted by your student.
-                            Depending on the number of questions you are supposed to respond with [score]/[number of questions].
-                            NOTE: You are not supposed to give 1 even if the answer is 100% correct.
-                        `,
-                    },
-                    {
-                        role: "user",
-                        content: JSON.stringify(formData),
-                    },
-                ],
+                input: formData.submittedAnswer,
+                model: "text-embedding-3-small",
             }),
         })
-        if (!res.ok) {
-            throw new Error(res.statusText)
-        }
+        const embedding = await res.json()
 
-        const response = await res.json()
-        return {
-            status: "ok",
-            title: "Success!",
-            description: `Your score is ${response.choices[0].message.content}`,
+        const a = math.matrix(JSON.parse(quizData.answer_embedding))
+        const b = math.matrix(embedding.data[0].embedding)
+        const score = math.dot(a, b)
+
+        if (score > 0.6) {
+            const { error } = await supabase
+                .from("qna")
+                .update({
+                    graded: true,
+                })
+                .eq("id", quizData.id)
+            if (error) {
+                throw new Error(error.message)
+            }
+
+            return {
+                status: "ok",
+                title: "Correct",
+            }
+        } else {
+            return {
+                status: "ok",
+                title: "Incorrect",
+                variant: "destructive",
+            }
         }
     } catch (e: any) {
         console.error(e)

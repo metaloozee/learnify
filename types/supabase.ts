@@ -124,6 +124,7 @@ export interface Database {
                 Row: {
                     answer: string
                     answer_embedding: string
+                    graded: boolean | null
                     id: string
                     noteid: string
                     question: string
@@ -133,6 +134,7 @@ export interface Database {
                 Insert: {
                     answer: string
                     answer_embedding: string
+                    graded?: boolean | null
                     id?: string
                     noteid: string
                     question: string
@@ -142,6 +144,7 @@ export interface Database {
                 Update: {
                     answer?: string
                     answer_embedding?: string
+                    graded?: boolean | null
                     id?: string
                     noteid?: string
                     question?: string
