@@ -77,14 +77,8 @@ export default async function TeacherSubjectIndexPage({
                 </TabsList>
                 <TabsContent value="notes">
                     <div className="mt-16 flex flex-col gap-5">
-                        <Badge className="max-w-fit" variant={"outline"}>
-                            {subject.subjectname}
-                        </Badge>
                         <h1 className="text-3xl md:text-4xl">
-                            Note-orious{" "}
-                            <span className="text-muted-foreground">
-                                Teacher Hub
-                            </span>
+                            {subject.subjectname}
                         </h1>
                         <p className="text-md text-muted-foreground">
                             Effortlessly organize and enhance your teaching
