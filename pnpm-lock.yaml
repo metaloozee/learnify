@@ -87,8 +87,8 @@ dependencies:
         specifier: ^8.11.6
         version: 8.11.6(react-dom@18.2.0)(react@18.2.0)
     "@xenova/transformers":
-        specifier: ^2.14.1
-        version: 2.14.1
+        specifier: ^2.4.2
+        version: 2.4.2
     autoprefixer:
         specifier: 10.4.15
         version: 10.4.15(postcss@8.4.29)
@@ -881,14 +881,6 @@ packages:
         resolution:
             {
                 integrity: sha512-Xna7arltBSBoKaH3diGi3sYvkExgJMd/pF4T6vl2YbmDccbr1G/X5EPZ2048p+YgrJYG1jTYFCtY6Dr3HvJaow==,
-            }
-        engines: { node: ">=18" }
-        dev: false
-
-    /@huggingface/jinja@0.1.2:
-        resolution:
-            {
-                integrity: sha512-x5mpbfJt1nKmVep5WNP5VjNsjWApWNj8pPYI+uYMkBWH9bWUJmQmHt2lbf0VCoQd54Oq3XuFEh/UyoVh7rPxmg==,
             }
         engines: { node: ">=18" }
         dev: false
@@ -3667,13 +3659,12 @@ packages:
             "@xtuc/long": 4.2.2
         dev: false
 
-    /@xenova/transformers@2.14.1:
+    /@xenova/transformers@2.4.2:
         resolution:
             {
-                integrity: sha512-aj4aXxci3pTf6BEavm8ASu4doGPQP3l5KPXTnem4jMTWuXV2ZFhea0L5MWrYWgSWqtptwN6UqHzW6npKExsaQQ==,
+                integrity: sha512-m1QlvNsic/kQJ1F1N02TpYkIBPwB68hZGljO32EM4mHEw4nKlPoQ/9gZ+oUKkavKC/LqgCnmiNQ8jWfa4Zl5AQ==,
             }
         dependencies:
-            "@huggingface/jinja": 0.1.2
             onnxruntime-web: 1.14.0
             sharp: 0.32.6
         optionalDependencies:

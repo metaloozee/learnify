@@ -104,7 +104,6 @@ export const evaluateQuizAnswer = async (
         }
 
         const response = await res.json()
-        console.log(response.choices[0].message.content)
         return {
             status: "ok",
             title: "Success!",
@@ -179,18 +178,57 @@ export const generatePersonalizedMiniQuiz = async (
         }
 
         const generatedQuiz = await res.json()
-
-        const { error } = await supabase.from("generatedcontent").upsert({
-            contentid: formData.contentid ?? randomUUID(),
-            contenttitle: `[QUIZ] ${formData.notetitle}`,
-            contentbody: generatedQuiz.choices[0].message.content,
-            contenttype: "quiz",
-            noteid: formData.noteid,
-            studentid: session?.user.id,
+        const q_res = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                input: JSON.parse(generatedQuiz.choices[0].message.content).map(
+                    (q: any) => q.question
+                ),
+                model: "text-embedding-3-small",
+            }),
         })
-        if (error) {
-            throw new Error(error.message)
+        if (!q_res.ok) {
+            console.error(q_res.statusText)
         }
+        const q_embeddings = await q_res.json()
+
+        const a_res = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                input: JSON.parse(generatedQuiz.choices[0].message.content).map(
+                    (q: any) => q.answer
+                ),
+                model: "text-embedding-3-small",
+            }),
+        })
+        if (!a_res.ok) {
+            console.error(q_res.statusText)
+        }
+        const a_embeddings = await a_res.json()
+
+        JSON.parse(generatedQuiz.choices[0].message.content).forEach(
+            async (q: any, index: number) => {
+                const { error } = await supabase.from("qna").insert({
+                    question: q.question,
+                    question_embedding: q_embeddings.data[index].embedding,
+                    answer: q.answer,
+                    answer_embedding: a_embeddings.data[index].embedding,
+                    noteid: formData.noteid,
+                    studentid: formData.studentid,
+                })
+                if (error) {
+                    throw new Error(error.message)
+                }
+            }
+        )
 
         return {
             status: "ok",

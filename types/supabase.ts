@@ -120,6 +120,51 @@ export interface Database {
                     },
                 ]
             }
+            qna: {
+                Row: {
+                    answer: string
+                    answer_embedding: string
+                    id: string
+                    noteid: string
+                    question: string
+                    question_embedding: string
+                    studentid: string
+                }
+                Insert: {
+                    answer: string
+                    answer_embedding: string
+                    id?: string
+                    noteid: string
+                    question: string
+                    question_embedding: string
+                    studentid: string
+                }
+                Update: {
+                    answer?: string
+                    answer_embedding?: string
+                    id?: string
+                    noteid?: string
+                    question?: string
+                    question_embedding?: string
+                    studentid?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "qna_noteid_fkey"
+                        columns: ["noteid"]
+                        isOneToOne: false
+                        referencedRelation: "notes"
+                        referencedColumns: ["noteid"]
+                    },
+                    {
+                        foreignKeyName: "qna_studentid_fkey"
+                        columns: ["studentid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
+                    },
+                ]
+            }
             studentenrollment: {
                 Row: {
                     enrollmentid: string
@@ -182,6 +227,13 @@ export interface Database {
                         isOneToOne: false
                         referencedRelation: "generatedcontent"
                         referencedColumns: ["contentid"]
+                    },
+                    {
+                        foreignKeyName: "studentprogress_userid_fkey"
+                        columns: ["userid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
                     },
                 ]
             }

@@ -55,12 +55,10 @@ export default async function StudentNotesIndexPage({
         .eq("contenttype", "flash_cards")
         .maybeSingle()
     const { data: quiz } = await supabase
-        .from("generatedcontent")
+        .from("qna")
         .select("*")
         .eq("noteid", noteData?.noteid ?? "")
         .eq("studentid", studentData?.userid ?? "")
-        .eq("contenttype", "quiz")
-        .maybeSingle()
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
@@ -111,6 +109,7 @@ export default async function StudentNotesIndexPage({
                                     content={notes}
                                     studentid={studentData.userid}
                                     type="note"
+                                    regenerate
                                 >
                                     Regenerate Note{" "}
                                     <SymbolIcon className="ml-2" />
@@ -134,7 +133,6 @@ export default async function StudentNotesIndexPage({
                                 content={notes}
                                 studentid={studentData.userid}
                                 type="note"
-                                regenerate
                             >
                                 Generate Content{" "}
                                 <CookingPot className="ml-2 h-4 w-4" />
@@ -203,7 +201,7 @@ export default async function StudentNotesIndexPage({
                     )}
                 </TabsContent>
                 <TabsContent value="mini_quiz">
-                    {quiz ? (
+                    {quiz && quiz.length > 0 ? (
                         <Suspense
                             fallback={
                                 <div className="mt-5 flex flex-col gap-5 ">
@@ -215,7 +213,7 @@ export default async function StudentNotesIndexPage({
                             }
                         >
                             <div className="w-full mt-5">
-                                <Quiz
+                                {/* <Quiz
                                     quiz={
                                         {
                                             quiz: JSON.parse(quiz.contentbody),
@@ -224,19 +222,12 @@ export default async function StudentNotesIndexPage({
                                             studentid: studentData.userid,
                                         } as QuizProps
                                     }
-                                />
-                                {/* {JSON.parse(quiz.contentbody).map((q: any) => (
-                                    <Quiz
-                                        key={q.id}
-                                        question={q.question}
-                                        answer={q.answer}
-                                    />
-                                ))} */}
+                                /> */}
                             </div>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
                                 <GenerateContentButton
                                     note={noteData}
-                                    content={quiz}
+                                    content={null}
                                     studentid={studentData.userid}
                                     type="quiz"
                                     regenerate
