@@ -30,25 +30,25 @@ import { useSupabase } from "@/app/supabase-provider"
 import type { NoteData } from "@/app/teacher/notes/[id]/page"
 import type { Subject } from "@/app/teacher/page"
 
-interface TeacherPlaygroundProps {
+interface NotesPlaygroundProps {
     session: Session
     user: UserData
     subject: Subject
     note: NoteData
 }
 
-const TeacherPlaygroundFormSchema = z.object({
+const NotesPlaygroundFormSchema = z.object({
     title: z.string().optional(),
     content: z.string().min(10).optional(),
     description: z.string().optional(),
 })
 
-export const TeacherPlayground = ({
+export const NotesPlayground = ({
     session,
     user,
     subject,
     note,
-}: TeacherPlaygroundProps) => {
+}: NotesPlaygroundProps) => {
     const { supabase } = useSupabase()
     const { toast } = useToast()
 
@@ -67,8 +67,8 @@ export const TeacherPlayground = ({
         }
     }, [])
 
-    const form = useForm<z.infer<typeof TeacherPlaygroundFormSchema>>({
-        resolver: zodResolver(TeacherPlaygroundFormSchema),
+    const form = useForm<z.infer<typeof NotesPlaygroundFormSchema>>({
+        resolver: zodResolver(NotesPlaygroundFormSchema),
         defaultValues: {
             title: note.notetitle,
             content: note.notecontent,
@@ -77,7 +77,7 @@ export const TeacherPlayground = ({
     })
 
     const onSave = async (
-        values: z.infer<typeof TeacherPlaygroundFormSchema>
+        values: z.infer<typeof NotesPlaygroundFormSchema>
     ) => {
         try {
             setLoading(true)
@@ -113,7 +113,7 @@ export const TeacherPlayground = ({
     }
 
     const onSubmit = async (
-        values: z.infer<typeof TeacherPlaygroundFormSchema>
+        values: z.infer<typeof NotesPlaygroundFormSchema>
     ) => {
         try {
             setLoading(true)
