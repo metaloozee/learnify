@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NotesCard } from "@/components/note-card"
 import { Search } from "@/components/search"
+import { StudentEnrollmentDataTable } from "@/components/student-data-table"
 import { SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
@@ -42,6 +43,19 @@ export default async function TeacherSubjectIndexPage({
         .eq("teacherid", session?.user.id ?? "")
         .single()
 
+    const { data: studentEnrollment } = await supabase
+        .from("studentenrollment")
+        .select(
+            `
+            enrollmentid,
+            userid,
+            subjectid,
+
+            users (userid, username, usertype, first_name, last_name)
+        `
+        )
+        .eq("subjectid", params.id)
+
     const createNote = async () => {
         "use server"
         const supabase = await createServerActionClient<Database>({ cookies })
@@ -68,7 +82,7 @@ export default async function TeacherSubjectIndexPage({
         }
     }
 
-    return session && userData && subject ? (
+    return session && userData && subject && studentEnrollment ? (
         <div className="w-full h-full flex flex-col justify-center">
             <Tabs defaultValue="notes">
                 <TabsList>
@@ -121,7 +135,25 @@ export default async function TeacherSubjectIndexPage({
                         </div>
                     </div>
                 </TabsContent>
-                <TabsContent value="students">coming soon</TabsContent>
+                <TabsContent value="students">
+                    <div className="mt-16 flex flex-col gap-5">
+                        <h1 className="text-3xl md:text-4xl">
+                            Student{" "}
+                            <span className="text-muted-foreground">
+                                Management
+                            </span>
+                        </h1>
+                        <p className="text-md text-muted-foreground">
+                            Effortlessly oversee and guide your students'
+                            educational journey. Manage enrollments, track
+                            progress, and provide personalized support for a
+                            tailored learning experience
+                        </p>
+                    </div>
+                    <div className="mt-10">
+                        <StudentEnrollmentDataTable data={studentEnrollment} />
+                    </div>
+                </TabsContent>
             </Tabs>
         </div>
     ) : (
