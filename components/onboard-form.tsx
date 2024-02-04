@@ -42,7 +42,7 @@ export const OnboardForm = ({ session }: { session: Session }) => {
     })
 
     return (
-        <div className="container border rounded-xl p-10">
+        <div className="container border rounded-xl p-10 bg-background/30 backdrop-blur-md">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(async (data) => {

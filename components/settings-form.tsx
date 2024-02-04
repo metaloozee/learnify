@@ -51,7 +51,7 @@ export const AccountSettingsForm = ({
     })
 
     return (
-        <div className="container border rounded-xl p-10 w-full">
+        <div className="container border rounded-xl p-10 w-full bg-background/30 backdrop-blur-md">
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(async (data) => {
