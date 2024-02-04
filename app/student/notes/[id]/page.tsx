@@ -59,6 +59,7 @@ export default async function StudentNotesIndexPage({
         .select("*")
         .eq("noteid", noteData?.noteid ?? "")
         .eq("studentid", studentData?.userid ?? "")
+        .order("graded", { nullsFirst: true })
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
@@ -76,7 +77,7 @@ export default async function StudentNotesIndexPage({
                     nevermind
                 </Link>
             </Button>
-            <Tabs className="mt-10" defaultValue="mini_quiz">
+            <Tabs className="mt-10" defaultValue="note">
                 <TabsList>
                     <TabsTrigger className="text-xs" value="note">
                         Personalized Note
