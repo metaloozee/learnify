@@ -12,17 +12,23 @@ export default async function StudentIndexPage() {
         data: { session },
     } = await supabase.auth.getSession()
 
+    const { data: user } = await supabase
+        .from("users")
+        .select("first_name, last_name")
+        .eq("userid", session?.user.id ?? "")
+        .maybeSingle()
+
     const { data: userSubjects } = await supabase
         .from("studentenrollment")
-        .select("*, users(*)")
+        .select("subjectid")
         .eq("userid", session?.user.id ?? "")
 
-    return session && userSubjects ? (
+    return session && user ? (
         <div className="mt-20 flex flex-col gap-2 md:gap-5">
             <h1 className="text-3xl md:text-4xl">
                 Welcome back,{" "}
                 <span className="text-muted-foreground">
-                    {userSubjects[0].users?.first_name}
+                    {user?.first_name}
                 </span>
             </h1>
             <p className="text-sm md:text-md text-muted-foreground">
@@ -47,12 +53,13 @@ export default async function StudentIndexPage() {
                         </>
                     }
                 >
-                    {userSubjects.map((subject, index) => (
-                        <StudentSubjectCard
-                            key={index}
-                            subjectid={subject.subjectid}
-                        />
-                    ))}
+                    {userSubjects &&
+                        userSubjects.map((subject, index) => (
+                            <StudentSubjectCard
+                                key={index}
+                                subjectid={subject.subjectid}
+                            />
+                        ))}
                 </Suspense>
             </div>
         </div>
