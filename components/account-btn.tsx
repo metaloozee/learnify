@@ -95,9 +95,11 @@ export const UserAccount = ({
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
-    ) : (
+    ) : children ? (
         <Button className="shadow-xl max-w-fit group" onClick={handleLogin}>
-            {children ?? "Login"}
+            {children}
         </Button>
+    ) : (
+        <></>
     )
 }

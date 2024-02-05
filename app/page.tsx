@@ -28,8 +28,16 @@ import { UserAccount } from "@/components/account-btn"
 export default async function Index() {
     return (
         <main className="flex-1">
-            <section className="w-full pb-12 mt-32 md:mt-0">
-                <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+            <section className="w-full pb-12 mb-24 md:mb-0 md:mt-0">
+                <div className="grid gap-12 direction-reverse lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+                    <AspectRatio ratio={1 / 1}>
+                        <Image
+                            src={Remote}
+                            alt="Learnify"
+                            fill
+                            className="rounded-xl object-cover"
+                        />
+                    </AspectRatio>
                     <div className="flex flex-col justify-center space-y-4">
                         <div className="space-y-2">
                             <h1 className="text-3xl md:text-4xl">
@@ -49,14 +57,6 @@ export default async function Index() {
                             </>
                         </UserAccount>
                     </div>
-                    <AspectRatio ratio={1 / 1}>
-                        <Image
-                            src={Remote}
-                            alt="Learnify"
-                            fill
-                            className="rounded-xl object-cover"
-                        />
-                    </AspectRatio>
                 </div>
             </section>
             <Separator />
