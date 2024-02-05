@@ -42,7 +42,7 @@ export default async function Index() {
 
     return (
         <main className="flex-1">
-            <section className="w-full mt-48 md:mt-12">
+            <section className="w-full mt-48 md:mt-0">
                 <div className="grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
                     <div className="flex flex-col justify-center items-center md:items-start space-y-4">
                         <div className="space-y-2 text-center md:text-left">
@@ -193,7 +193,7 @@ export default async function Index() {
                     </div>
                 </div>
             </section>
-            <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg md:rounded-full rounded-xl border p-5">
+            {/* <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg md:rounded-full rounded-xl border p-5">
                 <div className="flex flex-col justify-between items-center gap-2 text-center">
                     <h1 className="font-bold text-xl md:text-3xl">
                         Our Project is Open Source!
@@ -211,7 +211,7 @@ export default async function Index() {
                         </Link>
                     </Button>
                 </div>
-            </section>
+            </section> */}
         </main>
     )
 }
