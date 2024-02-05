@@ -24,9 +24,11 @@ import { useSupabase } from "@/app/supabase-provider"
 export const UserAccount = ({
     user,
     userData,
+    children,
 }: {
     user: User | null
     userData: UserData | null
+    children?: React.ReactElement
 }) => {
     const router = useRouter()
     const { supabase: supa } = useSupabase()
@@ -94,8 +96,8 @@ export const UserAccount = ({
             </DropdownMenuContent>
         </DropdownMenu>
     ) : (
-        <Button className="shadow-xl" onClick={handleLogin}>
-            Login
+        <Button className="shadow-xl max-w-fit group" onClick={handleLogin}>
+            {children ?? "Login"}
         </Button>
     )
 }
