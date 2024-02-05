@@ -4,16 +4,10 @@ import FlashCard from "@/public/_static/illustrations/flashcard.svg"
 import Notes from "@/public/_static/illustrations/notes.svg"
 import Quiz from "@/public/_static/illustrations/quiz.svg"
 import Remote from "@/public/_static/illustrations/remote.svg"
-import Teacher from "@/public/_static/illustrations/teacher.svg"
-import { ArrowRightIcon } from "@radix-ui/react-icons"
+import { ArrowRightIcon, GitHubLogoIcon } from "@radix-ui/react-icons"
 
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "@/components/ui/accordion"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
@@ -24,22 +18,34 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { UserAccount } from "@/components/account-btn"
+import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function Index() {
+    const supabase = await createServerSupabaseClient()
+
+    const { count: contentStats } = await supabase
+        .from("generatedcontent")
+        .select("*", { count: "estimated", head: true })
+    const { count: qnaStats } = await supabase
+        .from("qna")
+        .select("*", { count: "estimated", head: true })
+    const { count: studentCount } = await supabase
+        .from("users")
+        .select("*", { count: "estimated", head: true })
+        .eq("usertype", "student")
+    const { count: subjectCount } = await supabase
+        .from("subjects")
+        .select("*", { count: "estimated", head: true })
+
+    const generatedContentStats =
+        contentStats && qnaStats && contentStats + qnaStats
+
     return (
         <main className="flex-1">
-            <section className="w-full pb-12 mb-24 md:mb-0 md:mt-0">
-                <div className="grid gap-12 direction-reverse lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-                    <AspectRatio ratio={1 / 1}>
-                        <Image
-                            src={Remote}
-                            alt="Learnify"
-                            fill
-                            className="rounded-xl object-cover"
-                        />
-                    </AspectRatio>
-                    <div className="flex flex-col justify-center space-y-4">
-                        <div className="space-y-2">
+            <section className="w-full mt-48 md:mt-12">
+                <div className="grid gap-12 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
+                    <div className="flex flex-col justify-center items-center md:items-start space-y-4">
+                        <div className="space-y-2 text-center md:text-left">
                             <h1 className="text-3xl md:text-4xl">
                                 Discover Tailored Learning Experiences
                             </h1>
@@ -57,10 +63,51 @@ export default async function Index() {
                             </>
                         </UserAccount>
                     </div>
+                    <AspectRatio ratio={1 / 1}>
+                        <Image
+                            src={Remote}
+                            alt="Learnify"
+                            fill
+                            className="rounded-xl object-cover"
+                        />
+                    </AspectRatio>
                 </div>
             </section>
-            <Separator />
-            <section className="w-full py-12">
+            <section className="relative w-full min-h-[100px] bg-muted/30 backdrop-blur-lg rounded-full border">
+                <div className="container grid grid-cols-3 justify-items-center py-5">
+                    <div className="flex flex-row">
+                        <div className="text-center">
+                            <h1 className="font-bold text-xl md:text-4xl">
+                                {studentCount}+
+                            </h1>
+                            <p className="max-w-[600px] text-xs md:text-md text-muted-foreground">
+                                Students
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex flex-row">
+                        <div className="text-center">
+                            <h1 className="font-bold text-xl md:text-4xl">
+                                {generatedContentStats}+
+                            </h1>
+                            <p className="max-w-[600px] text-xs md:text-md text-muted-foreground">
+                                Contents Generated
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex flex-row">
+                        <div className="text-center">
+                            <h1 className="font-bold text-xl md:text-4xl">
+                                {subjectCount}+
+                            </h1>
+                            <p className="max-w-[600px] text-xs md:text-md text-muted-foreground">
+                                Subjects
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section className="w-full my-12">
                 <div className="container px-4 md:px-6">
                     <div className="flex flex-col items-center justify-center space-y-4 text-center">
                         <div className="space-y-2">
@@ -146,69 +193,23 @@ export default async function Index() {
                     </div>
                 </div>
             </section>
-            <Separator />
-            <section className="w-full py-12">
-                <div className="container px-4 md:px-6">
-                    <div className="flex flex-col items-center justify-center space-y-4 text-center">
-                        <div className="space-y-2">
-                            <h1 className="text-3xl md:text-4xl">
-                                Empowering Teachers
-                            </h1>
-                            <p className="max-w-[900px] text-md text-muted-foreground">
-                                Learnify is not just for students. Teachers can
-                                create and upload subject-specific notes, create
-                                quizzes, and monitor student progress.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-                        <Image
-                            className="mx-auto overflow-hidden rounded-xl object-cover lg:order-last lg:aspect-square"
-                            src={Teacher}
-                            alt="Learnify"
-                            height={500}
-                            width={500}
-                        />
-                        <div className="flex flex-col justify-center space-y-4">
-                            <Accordion
-                                className="w-full"
-                                collapsible
-                                type="single"
-                            >
-                                <AccordionItem value="item-1">
-                                    <AccordionTrigger className="text-sm md:text-lg">
-                                        Create and Upload Notes
-                                    </AccordionTrigger>
-                                    <AccordionContent className="text-muted-foreground">
-                                        Teachers can create and upload their own
-                                        notes for each subject, providing
-                                        students with additional resources for
-                                        learning.
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-2">
-                                    <AccordionTrigger className="text-sm md:text-lg">
-                                        Create Quizzes
-                                    </AccordionTrigger>
-                                    <AccordionContent className="text-muted-foreground">
-                                        Teachers can create quizzes to test
-                                        student understanding and provide
-                                        instant feedback.
-                                    </AccordionContent>
-                                </AccordionItem>
-                                <AccordionItem value="item-3">
-                                    <AccordionTrigger className="text-sm md:text-lg">
-                                        Monitor Student Progress
-                                    </AccordionTrigger>
-                                    <AccordionContent className="text-muted-foreground">
-                                        Track student progress over time and
-                                        identify areas where students may need
-                                        additional support.
-                                    </AccordionContent>
-                                </AccordionItem>
-                            </Accordion>
-                        </div>
-                    </div>
+            <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg rounded-full border p-5">
+                <div className="flex flex-col justify-center items-center gap-2 text-center">
+                    <h1 className="font-bold text-xl md:text-3xl">
+                        Our Project is Open Source!
+                    </h1>
+                    <p className="max-w-[600px] text-xs md:text-md text-muted-foreground">
+                        Dive into the enchanted realm of our codebase! Wizards
+                        and sorceresses, feel free to inspect, enchant, and even
+                        summon your own additions. We welcome all brave
+                        contributors on this epic coding quest!
+                    </p>
+                    <Button className="my-5" asChild>
+                        <Link href="https://github.com/metaloozee/learnify">
+                            <GitHubLogoIcon className="h-6 w-6 mr-2" />
+                            500 Stars
+                        </Link>
+                    </Button>
                 </div>
             </section>
         </main>
