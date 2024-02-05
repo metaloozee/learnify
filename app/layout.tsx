@@ -14,8 +14,8 @@ const lora = Lora({
 })
 
 export const metadata = {
-    title: "Doro",
-    description: "Personalized Learning Web Application",
+    title: "Learnify",
+    description: "Elevating Education, One Personalized Step at a Time",
 }
 
 export const dynamic = "force-dynamic"
