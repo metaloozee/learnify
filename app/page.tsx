@@ -193,8 +193,8 @@ export default async function Index() {
                     </div>
                 </div>
             </section>
-            <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg rounded-full border p-5">
-                <div className="flex flex-col justify-center items-center gap-2 text-center">
+            <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg md:rounded-full rounded-xl border p-5">
+                <div className="flex flex-col justify-between items-center gap-2 text-center">
                     <h1 className="font-bold text-xl md:text-3xl">
                         Our Project is Open Source!
                     </h1>
@@ -204,7 +204,7 @@ export default async function Index() {
                         summon your own additions. We welcome all brave
                         contributors on this epic coding quest!
                     </p>
-                    <Button className="my-5" asChild>
+                    <Button className="mt-5" asChild>
                         <Link href="https://github.com/metaloozee/learnify">
                             <GitHubLogoIcon className="h-6 w-6 mr-2" />
                             500 Stars
