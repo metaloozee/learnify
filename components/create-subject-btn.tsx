@@ -78,8 +78,8 @@ export const CreateSubjectButton = () => {
 }
 
 export const subjectFormSchema = z.object({
-    subjectname: z.string().min(5).max(20),
-    subjectdescription: z.string().min(10).max(100),
+    subjectname: z.string().min(5).max(50),
+    subjectdescription: z.string().min(10).max(120),
 })
 
 const SubjectForm = ({ className }: React.ComponentProps<"form">) => {
