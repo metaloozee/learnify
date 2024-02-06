@@ -156,7 +156,7 @@ export const generatePersonalizedMiniQuiz = async (
             },
             method: "POST",
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-3.5-turbo-0125",
                 messages: [
                     {
                         role: "system",
@@ -282,7 +282,7 @@ export const generatePersonalizedFlashCards = async (
             },
             method: "POST",
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-3.5-turbo-0125",
                 messages: [
                     {
                         role: "system",
@@ -368,7 +368,7 @@ export const generatePersonalizedNote = async (
             },
             method: "POST",
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",
+                model: "gpt-3.5-turbo-0125",
                 messages: [
                     {
                         role: "system",

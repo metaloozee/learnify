@@ -69,7 +69,6 @@ export const GenerateContentButton = ({
             notetitle: note.notetitle,
         },
     })
-
     return (
         <form
             onSubmit={form.handleSubmit(async (data) => {
