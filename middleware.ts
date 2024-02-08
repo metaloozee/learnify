@@ -9,12 +9,12 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     const res = NextResponse.next()
     const supabase = createMiddlewareClient<Database>({ req, res })
     const key = decodeURIComponent(req.nextUrl.pathname.split("/")[1])
-
+    console.log(key.length)
     const ip = req.ip
 
     const ratelimit = new Ratelimit({
         redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(5, "10 s"),
+        limiter: Ratelimit.fixedWindow(5, "2 s"),
     })
 
     const {
@@ -39,7 +39,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
         if (userData.usertype === "teacher") {
             return NextResponse.redirect(new URL("/teacher", req.url))
         }
-    } else {
+    } else if (session && key.length !== 0) {
         const { success, pending } = await ratelimit.limit(`mw_${ip}`)
         event.waitUntil(pending)
 
@@ -60,6 +60,6 @@ export const config = {
          * - favicon.ico (favicon file)
          * Feel free to modify this pattern to include more paths.
          */
-        "/((?!_next/static|_next/image|favicon.ico).*)",
+        "/((?!_next/static|_next/image|favicon.ico|api).*)",
     ],
 }
