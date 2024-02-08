@@ -9,7 +9,6 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     const res = NextResponse.next()
     const supabase = createMiddlewareClient<Database>({ req, res })
     const key = decodeURIComponent(req.nextUrl.pathname.split("/")[1])
-    console.log(key.length)
     const ip = req.ip
 
     const ratelimit = new Ratelimit({

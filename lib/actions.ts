@@ -165,17 +165,18 @@ export const generatePersonalizedMiniQuiz = async (
                             Your job is to paraphrase the following note and generate a mini-quiz for the important points in the following json format.
                             The quiz should either contain a single-line answer to a question or a single word answer to the question.
                             Provide minimum 10 questions
+                            Do not use single quotes while providing me with the output
 
                             [
                                 {
-                                    id: 1,
-                                    question: "question which will be displayed to the user",
-                                    answer: "answer to the question"
+                                    "id": 1,
+                                    "question": "question which will be displayed to the user",
+                                    "answer": "answer to the question"
                                 },
                                 {
-                                    id: 2,
-                                    question: "question which will be displayed to the user",
-                                    answer: "answer to the question"
+                                    "id": 2,
+                                    "question": "question which will be displayed to the user",
+                                    "answer": "answer to the question"
                                 }
                             ]
                         `,
@@ -290,17 +291,18 @@ export const generatePersonalizedFlashCards = async (
                             You are a Personal AI tutor and your student learns better using flashcards.
                             Your job is to paraphrase the following note and generate flashcards for the important points in the following json format.
                             The flashcards should either contain a single-line answer to a question or a single word answer to the question.
-
+                            Do not use single quotes while providing me with the output
+                            
                             [
                                 {
-                                    id: 1,
-                                    flashcard_title: "title which will be displayed on the cover",
-                                    flashcard_answer: "answer which will be displayed when the user clicks on the card"
+                                    "id": 1,
+                                    "flashcard_title": "title which will be displayed on the cover",
+                                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
                                 },
                                 {
-                                    id: 2,
-                                    flashcard_title: "title which will be displayed on the cover",
-                                    flashcard_answer: "answer which will be displayed when the user clicks on the card"
+                                    "id": 2,
+                                    "flashcard_title": "title which will be displayed on the cover",
+                                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
                                 }
                             ]
                         `,
