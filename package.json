@@ -44,6 +44,8 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "^2.39.2",
     "@tanstack/react-table": "^8.11.6",
+    "@upstash/ratelimit": "^1.0.1",
+    "@upstash/redis": "^1.28.3",
     "autoprefixer": "10.4.15",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
