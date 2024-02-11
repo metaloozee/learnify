@@ -39,11 +39,14 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
             return NextResponse.redirect(new URL("/teacher", req.url))
         }
     } else if (session && key.length !== 0) {
-        const { success, pending } = await ratelimit.limit(`mw_${ip}`)
+        const { success, pending, reset } = await ratelimit.limit(`mw_${ip}`)
         event.waitUntil(pending)
 
         if (!success) {
-            return NextResponse.redirect(new URL("/api/blocked", req.url))
+            return NextResponse.json({
+                status: 429,
+                statusText: "Rate Limit Exceeded",
+            })
         }
     }
 
