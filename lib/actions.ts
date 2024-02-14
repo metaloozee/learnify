@@ -11,9 +11,121 @@ import * as z from "zod"
 import { Database } from "@/types/supabase"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
+import { NotesPlaygroundFormSchema } from "@/components/notes-playground"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { QuizFormSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
+
+export const saveNote = async (
+    formData: z.infer<typeof NotesPlaygroundFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const res = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                input: formData.content,
+                model: "text-embedding-3-large",
+            }),
+        })
+        const embedding = await res.json()
+
+        const { error } = await supabase
+            .from("notes")
+            .update({
+                notetitle: formData.title,
+                notecontent: formData.content,
+                embeddings: embedding.data[0].embedding,
+            })
+            .eq("noteid", formData.noteid)
+        if (error) {
+            throw new Error(error.message)
+        }
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully updated the Note.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/notes/${formData.noteid}`)
+    }
+}
+
+export const publishNote = async (
+    formData: z.infer<typeof NotesPlaygroundFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const res = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                input: formData.content,
+                model: "text-embedding-3-large",
+            }),
+        })
+        const embedding = await res.json()
+
+        const { error } = await supabase
+            .from("notes")
+            .update({
+                notetitle: formData.title,
+                notecontent: formData.content,
+                embeddings: embedding.data[0].embedding,
+                is_published: true,
+            })
+            .eq("noteid", formData.noteid)
+        if (error) {
+            throw new Error(error.message)
+        }
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully Published the Note.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/notes/${formData.noteid}`)
+    }
+}
 
 export const createNewSubject = async (
     formData: z.infer<typeof subjectFormSchema>

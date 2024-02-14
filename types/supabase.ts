@@ -6,7 +6,7 @@ export type Json =
     | { [key: string]: Json | undefined }
     | Json[]
 
-export interface Database {
+export type Database = {
     public: {
         Tables: {
             analytics: {
@@ -77,6 +77,7 @@ export interface Database {
             }
             notes: {
                 Row: {
+                    embeddings: string | null
                     is_published: boolean
                     notecontent: string
                     noteid: string
@@ -86,6 +87,7 @@ export interface Database {
                     updated_at: string | null
                 }
                 Insert: {
+                    embeddings?: string | null
                     is_published?: boolean
                     notecontent: string
                     noteid?: string
@@ -95,6 +97,7 @@ export interface Database {
                     updated_at?: string | null
                 }
                 Update: {
+                    embeddings?: string | null
                     is_published?: boolean
                     notecontent?: string
                     noteid?: string

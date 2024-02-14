@@ -7,6 +7,8 @@ import { BookCheck, RotateCw, Save } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { publishNote, saveNote } from "@/lib/actions"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -26,7 +28,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import type { UserData } from "@/components/navbar"
-import { useSupabase } from "@/app/supabase-provider"
 import type { NoteData } from "@/app/teacher/notes/[id]/page"
 import type { Subject } from "@/app/teacher/page"
 
@@ -37,10 +38,11 @@ interface NotesPlaygroundProps {
     note: NoteData
 }
 
-const NotesPlaygroundFormSchema = z.object({
+export const NotesPlaygroundFormSchema = z.object({
     title: z.string().optional(),
     content: z.string().min(10).optional(),
     description: z.string().optional(),
+    noteid: z.string(),
 })
 
 export const NotesPlayground = ({
@@ -49,23 +51,8 @@ export const NotesPlayground = ({
     subject,
     note,
 }: NotesPlaygroundProps) => {
-    const { supabase } = useSupabase()
     const { toast } = useToast()
-
-    const [loading, setLoading] = React.useState(false)
-    const [width, setWidth] = React.useState(window.innerWidth)
-
-    React.useEffect(() => {
-        const handleWindowSizeChange = () => {
-            setWidth(window.innerWidth)
-        }
-
-        window.addEventListener("resize", handleWindowSizeChange)
-
-        return () => {
-            window.removeEventListener("resize", handleWindowSizeChange)
-        }
-    }, [])
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     const form = useForm<z.infer<typeof NotesPlaygroundFormSchema>>({
         resolver: zodResolver(NotesPlaygroundFormSchema),
@@ -73,89 +60,24 @@ export const NotesPlayground = ({
             title: note.notetitle,
             content: note.notecontent,
             description: note.notecontent.slice(0, 50),
+            noteid: note.noteid,
         },
     })
 
-    const onSave = async (
-        values: z.infer<typeof NotesPlaygroundFormSchema>
-    ) => {
-        try {
-            setLoading(true)
-
-            const { error } = await supabase
-                .from("notes")
-                .update({
-                    notetitle: values.title,
-                    notecontent: values.content,
-                })
-                .eq("noteid", note.noteid)
-            if (error) {
-                throw new Error(error.message)
-            }
-
-            return toast({
-                title: "Success!",
-                description: "You have successfully updated the note.",
-            })
-        } catch (e: any) {
-            console.error(e)
-
-            form.reset()
-
-            return toast({
-                title: "Oops! Something went wrong.",
-                description: e.message,
-                variant: "destructive",
-            })
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const onSubmit = async (
-        values: z.infer<typeof NotesPlaygroundFormSchema>
-    ) => {
-        try {
-            setLoading(true)
-
-            const { error } = await supabase
-                .from("notes")
-                .update({
-                    notetitle: values.title,
-                    notecontent: values.content,
-                    is_published: true,
-                })
-                .eq("noteid", note.noteid)
-            if (error) {
-                throw new Error(error.message)
-            }
-
-            console.log("sendind email")
-            await fetch("/api/send")
-
-            return toast({
-                title: "Success!",
-                description: "You have successfully published the note.",
-            })
-        } catch (e: any) {
-            console.error(e)
-
-            form.reset()
-
-            return toast({
-                title: "Oops! Something went wrong.",
-                description: e.message,
-                variant: "destructive",
-            })
-        } finally {
-            setLoading(false)
-        }
-    }
-
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-                {width >= 786 ? (
+            <form
+                onSubmit={form.handleSubmit(async (data) => {
+                    await publishNote(data).then((value: any) => {
+                        return toast({
+                            title: value.title,
+                            description: value.description,
+                            variant: value.variant ?? "default",
+                        })
+                    })
+                })}
+            >
+                {isDesktop ? (
                     <ResizablePanelGroup
                         direction="horizontal"
                         className="gap-5"
@@ -230,12 +152,13 @@ export const NotesPlayground = ({
                                         className="w-full"
                                         type="submit"
                                         variant={"secondary"}
+                                        disabled={form.formState.isLoading}
                                     >
                                         <BookCheck className="mr-2 h-4 w-4" />
                                         Publish
                                     </Button>
                                 )}
-                                {loading ? (
+                                {form.formState.isLoading ? (
                                     <Button className="w-full" disabled>
                                         <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                         Please Wait
@@ -244,7 +167,22 @@ export const NotesPlayground = ({
                                     <Button
                                         className="w-full"
                                         type="submit"
-                                        onClick={form.handleSubmit(onSave)}
+                                        onClick={form.handleSubmit(
+                                            async (data) => {
+                                                await saveNote(data).then(
+                                                    (value: any) => {
+                                                        return toast({
+                                                            title: value.title,
+                                                            description:
+                                                                value.description,
+                                                            variant:
+                                                                value.variant ??
+                                                                "variant",
+                                                        })
+                                                    }
+                                                )
+                                            }
+                                        )}
                                     >
                                         <Save className="mr-2 h-4 w-4" />
                                         Save
@@ -293,7 +231,7 @@ export const NotesPlayground = ({
                                 </FormItem>
                             )}
                         />
-                        {loading ? (
+                        {form.formState.isLoading ? (
                             <Button className="w-full" disabled type="submit">
                                 <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                 Please Wait
