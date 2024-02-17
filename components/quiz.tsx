@@ -14,11 +14,9 @@ import { useToast } from "@/components/ui/use-toast"
 
 export type QuizProps = {
     answer: string
-    answer_embedding: string
     id: string
     noteid: string
     question: string
-    question_embedding: string
     studentid: string
     graded: boolean | null
 }
