@@ -77,7 +77,6 @@ export type Database = {
             }
             notes: {
                 Row: {
-                    embeddings: string | null
                     is_published: boolean
                     notecontent: string
                     noteid: string
@@ -87,7 +86,6 @@ export type Database = {
                     updated_at: string | null
                 }
                 Insert: {
-                    embeddings?: string | null
                     is_published?: boolean
                     notecontent: string
                     noteid?: string
@@ -97,7 +95,6 @@ export type Database = {
                     updated_at?: string | null
                 }
                 Update: {
-                    embeddings?: string | null
                     is_published?: boolean
                     notecontent?: string
                     noteid?: string
@@ -126,32 +123,26 @@ export type Database = {
             qna: {
                 Row: {
                     answer: string
-                    answer_embedding: string
                     graded: boolean | null
                     id: string
                     noteid: string
                     question: string
-                    question_embedding: string
                     studentid: string
                 }
                 Insert: {
                     answer: string
-                    answer_embedding: string
                     graded?: boolean | null
                     id?: string
                     noteid: string
                     question: string
-                    question_embedding: string
                     studentid: string
                 }
                 Update: {
                     answer?: string
-                    answer_embedding?: string
                     graded?: boolean | null
                     id?: string
                     noteid?: string
                     question?: string
-                    question_embedding?: string
                     studentid?: string
                 }
                 Relationships: [
@@ -309,7 +300,19 @@ export type Database = {
             [_ in never]: never
         }
         Functions: {
-            [_ in never]: never
+            match_page_sections: {
+                Args: {
+                    embedding: string
+                    match_threshold: number
+                    match_count: number
+                    min_content_length: number
+                }
+                Returns: {
+                    noteid: string
+                    notecontent: string
+                    similarity: number
+                }[]
+            }
         }
         Enums: {
             [_ in never]: never

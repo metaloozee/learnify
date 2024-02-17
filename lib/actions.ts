@@ -4,8 +4,12 @@ import { randomUUID } from "crypto"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { env } from "@/env.mjs"
+import { HumanMessage, SystemMessage } from "@langchain/core/messages"
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai"
+import { PineconeStore } from "@langchain/pinecone"
+import { Pinecone } from "@pinecone-database/pinecone"
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
-import { all, create } from "mathjs"
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
@@ -15,6 +19,13 @@ import { NotesPlaygroundFormSchema } from "@/components/notes-playground"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { QuizFormSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
+
+const pinecone = new Pinecone({
+    apiKey: env.PINECONE_API_KEY,
+})
+const pineconeIndex = pinecone.Index("learnify")
+const openai = new ChatOpenAI({})
+const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
 
 export const saveNote = async (
     formData: z.infer<typeof NotesPlaygroundFormSchema>
@@ -29,25 +40,19 @@ export const saveNote = async (
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                input: formData.content,
-                model: "text-embedding-3-large",
-            }),
+        const docs = await textSplitter.createDocuments([
+            formData.content ?? "",
+        ])
+        await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings({}), {
+            pineconeIndex,
+            maxConcurrency: 10,
         })
-        const embedding = await res.json()
 
         const { error } = await supabase
             .from("notes")
             .update({
                 notetitle: formData.title,
                 notecontent: formData.content,
-                embeddings: embedding.data[0].embedding,
             })
             .eq("noteid", formData.noteid)
         if (error) {
@@ -84,25 +89,9 @@ export const publishNote = async (
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                input: formData.content,
-                model: "text-embedding-3-large",
-            }),
-        })
-        const embedding = await res.json()
-
         const { error } = await supabase
             .from("notes")
             .update({
-                notetitle: formData.title,
-                notecontent: formData.content,
-                embeddings: embedding.data[0].embedding,
                 is_published: true,
             })
             .eq("noteid", formData.noteid)
@@ -175,15 +164,14 @@ export const createNewSubject = async (
 export const evaluateQuizAnswer = async (
     formData: z.infer<typeof QuizFormSchema>
 ) => {
-    const math = create(all, {})
-
     const supabase = await createServerActionClient<Database>({ cookies })
+
     const {
         data: { session },
     } = await supabase.auth.getSession()
     const { data: quizData } = await supabase
         .from("qna")
-        .select("answer_embedding, id")
+        .select("id, notes(noteid, notecontent)")
         .eq("id", formData.id)
         .single()
 
@@ -196,24 +184,37 @@ export const evaluateQuizAnswer = async (
             throw new Error("Invalid quiz")
         }
 
-        const res = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                input: formData.submittedAnswer,
-                model: "text-embedding-3-small",
-            }),
+        const q_embedding = await new OpenAIEmbeddings().embedQuery(
+            formData.question
+        )
+        const results = await pineconeIndex.query({
+            vector: q_embedding,
+            topK: 2,
+            includeMetadata: true,
+            includeValues: false,
         })
-        const embedding = await res.json()
 
-        const a = math.matrix(JSON.parse(quizData.answer_embedding))
-        const b = math.matrix(embedding.data[0].embedding)
-        const score = math.dot(a, b)
+        const messages = [
+            new SystemMessage(`
+            You are a Personal AI tutor and you just gave your student to solve a mini-quiz.
+            You are being provided with the note's content, original question, original (correct) answer and student's answer.
+            Your task is to evaluate student's answer based on the original question, original answer and the context provided below.
+            If the student is wrong then just respond with a "false", if correct then respond with "true".
+    
+            Note's Content:
+            ${results.matches[0].metadata?.text}
+            `),
 
-        if (score > 0.6) {
+            new HumanMessage(`
+            Original Question: ${formData.question}
+            Original Answer: ${formData.answer}
+            Student's Answer: ${formData.submittedAnswer}
+            `),
+        ]
+
+        const chatRes = await openai.invoke(messages)
+
+        if (chatRes.content === "true") {
             const { error } = await supabase
                 .from("qna")
                 .update({
@@ -226,12 +227,14 @@ export const evaluateQuizAnswer = async (
 
             return {
                 status: "ok",
-                title: "Correct",
+                title: "Correct.",
+                description: "The answer provided by you is correct!",
             }
         } else {
             return {
                 status: "ok",
-                title: "Incorrect",
+                title: "Incorrect.",
+                description: "The answer provided by you is incorrect!",
                 variant: "destructive",
             }
         }
@@ -244,7 +247,7 @@ export const evaluateQuizAnswer = async (
             variant: "destructive",
         }
     } finally {
-        revalidatePath(`/student/notes/*`)
+        revalidatePath(`/student/notes/${quizData?.notes?.noteid}`)
     }
 }
 
@@ -305,49 +308,11 @@ export const generatePersonalizedMiniQuiz = async (
         }
 
         const generatedQuiz = await res.json()
-        const q_res = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                input: JSON.parse(generatedQuiz.choices[0].message.content).map(
-                    (q: any) => q.question
-                ),
-                model: "text-embedding-3-small",
-            }),
-        })
-        if (!q_res.ok) {
-            console.error(q_res.statusText)
-        }
-        const q_embeddings = await q_res.json()
-
-        const a_res = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                input: JSON.parse(generatedQuiz.choices[0].message.content).map(
-                    (q: any) => q.answer
-                ),
-                model: "text-embedding-3-small",
-            }),
-        })
-        if (!a_res.ok) {
-            console.error(q_res.statusText)
-        }
-        const a_embeddings = await a_res.json()
-
         JSON.parse(generatedQuiz.choices[0].message.content).forEach(
             async (q: any, index: number) => {
                 const { error } = await supabase.from("qna").insert({
                     question: q.question,
-                    question_embedding: q_embeddings.data[index].embedding,
                     answer: q.answer,
-                    answer_embedding: a_embeddings.data[index].embedding,
                     noteid: formData.noteid,
                     studentid: formData.studentid,
                 })
