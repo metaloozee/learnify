@@ -1,12 +1,13 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { ArrowLeftIcon, SymbolIcon } from "@radix-ui/react-icons"
-import { CookingPot } from "lucide-react"
+import { Bot, CookingPot } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AiChatPlayground } from "@/components/ai-playground"
 import { FlashCard } from "@/components/flashcard"
 import { GenerateContentButton } from "@/components/generate-content"
 import { CustomMDX } from "@/components/mdx-remote"
@@ -105,6 +106,7 @@ export default async function StudentNotesIndexPage({
                                 <CustomMDX source={notes.contentbody} />
                             </ScrollArea>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
+                                <AiChatPlayground id={params.id} />
                                 <GenerateContentButton
                                     note={noteData}
                                     content={notes}
