@@ -64,20 +64,25 @@ export default async function StudentNotesIndexPage({
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
-            <Button
-                className="text-muted-foreground max-w-fit"
-                asChild
-                size={null}
-                variant={"link"}
-            >
-                <Link
-                    className="hover:underline"
-                    href={`/student/subject/${noteData.subjectid}`}
+            <div className="flex flex-row justify-between items-center">
+                <Button
+                    className="text-muted-foreground max-w-fit"
+                    asChild
+                    size={null}
+                    variant={"link"}
                 >
-                    <ArrowLeftIcon className="mr-2" />
-                    nevermind
-                </Link>
-            </Button>
+                    <Link
+                        className="hover:underline"
+                        href={`/student/subject/${noteData.subjectid}`}
+                    >
+                        <ArrowLeftIcon className="mr-2" />
+                        nevermind
+                    </Link>
+                </Button>
+
+                <AiChatPlayground />
+            </div>
+
             <Tabs className="mt-10" defaultValue="note">
                 <TabsList>
                     <TabsTrigger className="text-xs" value="note">
@@ -106,7 +111,6 @@ export default async function StudentNotesIndexPage({
                                 <CustomMDX source={notes.contentbody} />
                             </ScrollArea>
                             <div className="mt-10 flex flex-wrap flex-row gap-5">
-                                <AiChatPlayground id={params.id} />
                                 <GenerateContentButton
                                     note={noteData}
                                     content={notes}
