@@ -24,7 +24,9 @@ const pinecone = new Pinecone({
     apiKey: env.PINECONE_API_KEY,
 })
 const pineconeIndex = pinecone.Index("learnify")
-const openai = new ChatOpenAI({})
+const openai = new ChatOpenAI({
+    modelName: "gpt-3.5-turbo-0125",
+})
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
 
 export const saveNote = async (
@@ -264,51 +266,39 @@ export const generatePersonalizedMiniQuiz = async (
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo-0125",
-                messages: [
-                    {
-                        role: "system",
-                        content: `
-                            You are a Personal AI tutor and your student learns better using mini-quiz.
-                            Your job is to paraphrase the following note and generate a mini-quiz for the important points in the following json format.
-                            The quiz should either contain a single-line answer to a question or a single word answer to the question.
-                            Provide minimum 10 questions
-                            Do not use single quotes while providing me with the output
+        const messages = [
+            new SystemMessage(`
+            You are a Personal AI tutor and your student learns better using mini-quiz.
+            Your job is to paraphrase the following note and generate a mini-quiz for the important points in the following json format.
+            The quiz should either contain a single-line answer to a question or a single word answer to the question.
+            Provide minimum 10 questions
+            Do not use single quotes while providing me with the output
 
-                            [
-                                {
-                                    "id": 1,
-                                    "question": "question which will be displayed to the user",
-                                    "answer": "answer to the question"
-                                },
-                                {
-                                    "id": 2,
-                                    "question": "question which will be displayed to the user",
-                                    "answer": "answer to the question"
-                                }
-                            ]
-                        `,
-                    },
-                    {
-                        role: "user",
-                        content: formData.notecontent,
-                    },
-                ],
-            }),
-        })
-        if (!res.ok) {
-            throw new Error(res.statusText)
+            [
+                {
+                    "id": 1,
+                    "question": "question which will be displayed to the user",
+                    "answer": "answer to the question"
+                },
+                {
+                    "id": 2,
+                    "question": "question which will be displayed to the user",
+                    "answer": "answer to the question"
+                }
+            ]
+            `),
+            new HumanMessage(formData.notecontent),
+        ]
+
+        const res = await openai.invoke(messages)
+
+        if (!res) {
+            throw new Error(
+                "An Unknown error occurred while generating mini-quiz."
+            )
         }
 
-        const generatedQuiz = await res.json()
-        JSON.parse(generatedQuiz.choices[0].message.content).forEach(
+        JSON.parse(res.content.toString()).forEach(
             async (q: any, index: number) => {
                 const { error } = await supabase.from("qna").insert({
                     question: q.question,
@@ -353,54 +343,41 @@ export const generatePersonalizedFlashCards = async (
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo-0125",
-                messages: [
-                    {
-                        role: "system",
-                        content: `
-                            You are a Personal AI tutor and your student learns better using flashcards.
-                            Your job is to paraphrase the following note and generate flashcards for the important points in the following json format.
-                            The flashcards should either contain a single-line answer to a question or a single word answer to the question.
-                            Do not use single quotes while providing me with the output
+        const messages = [
+            new SystemMessage(`
+            You are a Personal AI tutor and your student learns better using flashcards.
+            Your job is to paraphrase the following note and generate flashcards for the important points in the following json format.
+            The flashcards should either contain a single-line answer to a question or a single word answer to the question.
+            Do not use single quotes while providing me with the output
                             
-                            [
-                                {
-                                    "id": 1,
-                                    "flashcard_title": "title which will be displayed on the cover",
-                                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
-                                },
-                                {
-                                    "id": 2,
-                                    "flashcard_title": "title which will be displayed on the cover",
-                                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
-                                }
-                            ]
-                        `,
-                    },
-                    {
-                        role: "user",
-                        content: formData.notecontent,
-                    },
-                ],
-            }),
-        })
-        if (!res.ok) {
-            throw new Error(res.statusText)
-        }
+            [
+                {
+                    "id": 1,
+                    "flashcard_title": "title which will be displayed on the cover",
+                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
+                },
+                {
+                    "id": 2,
+                    "flashcard_title": "title which will be displayed on the cover",
+                    "flashcard_answer": "answer which will be displayed when the user clicks on the card"
+                }
+            ]
+            `),
+            new HumanMessage(formData.notecontent),
+        ]
 
-        const generatedFlashCards = await res.json()
+        const res = await openai.invoke(messages)
+
+        if (!res) {
+            throw new Error(
+                "An Unknown error occurred while generating mini-quiz."
+            )
+        }
 
         const { error } = await supabase.from("generatedcontent").upsert({
             contentid: formData.contentid ?? randomUUID(),
             contenttitle: `[FLASHCARD] ${formData.notetitle}`,
-            contentbody: generatedFlashCards.choices[0].message.content,
+            contentbody: res.content.toString(),
             contenttype: "flash_cards",
             noteid: formData.noteid,
             studentid: session?.user.id,
@@ -440,41 +417,28 @@ export const generatePersonalizedNote = async (
             throw new Error("UNAUTHORIZED")
         }
 
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-            headers: {
-                Authorization: `Bearer ${env.OPENAI_API_KEY}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo-0125",
-                messages: [
-                    {
-                        role: "system",
-                        content: `
-                            You are a Personal AI tutor and your student learns better when the notes are provided to them in easy/simpler words.
-                            Your job is to paraphrase the following note generated by a teacher into a markdown (.mdx) code.
-                            Also, format the document properly, add headings, and subheadings, and use mdx components so that the text will be readable.
-                            You can also add additional data regarding your knowledge.
-                            `,
-                    },
-                    {
-                        role: "user",
-                        content: formData.notecontent,
-                    },
-                ],
-            }),
-        })
-        if (!res.ok) {
-            throw new Error(res.statusText)
-        }
+        const messages = [
+            new SystemMessage(`
+            You are a Personal AI tutor and your student learns better when the notes are provided to them in easy/simpler words.
+            Your job is to paraphrase the following note generated by a teacher into a markdown (.mdx) code.
+            Also, format the document properly, add headings, and subheadings, and use mdx components so that the text will be readable.
+            You can also add additional data regarding your knowledge.
+            `),
+            new HumanMessage(formData.notecontent),
+        ]
 
-        const generatedNote = await res.json()
+        const res = await openai.invoke(messages)
+
+        if (!res) {
+            throw new Error(
+                "An Unknown error occurred while generating mini-quiz."
+            )
+        }
 
         const { error } = await supabase.from("generatedcontent").upsert({
             contentid: formData.contentid ?? randomUUID(),
             contenttitle: `[NOTE] ${formData.notetitle}`,
-            contentbody: generatedNote.choices[0].message.content,
+            contentbody: res.content.toString(),
             contenttype: "note",
             noteid: formData.noteid,
             studentid: session?.user.id,
