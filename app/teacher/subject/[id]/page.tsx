@@ -2,6 +2,7 @@ import { Suspense } from "react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateNoteButton } from "@/components/create-note-btn"
+import { ManageSubject } from "@/components/manage-subject"
 import { NotesCard } from "@/components/note-card"
 import { Search } from "@/components/search"
 import { StudentEnrollmentDataTable } from "@/components/student-data-table"
@@ -53,10 +54,17 @@ export default async function TeacherSubjectIndexPage({
     return session && userData && subject && studentEnrollment ? (
         <div className="w-full h-full flex flex-col justify-center">
             <Tabs defaultValue="notes">
-                <TabsList>
-                    <TabsTrigger value="notes">Manage Notes</TabsTrigger>
-                    <TabsTrigger value="students">Manage Students</TabsTrigger>
-                </TabsList>
+                <div className="flex justify-between">
+                    <TabsList>
+                        <TabsTrigger value="notes">Manage Notes</TabsTrigger>
+                        <TabsTrigger value="students">
+                            Manage Students
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <ManageSubject subject={subject} />
+                </div>
+
                 <TabsContent value="notes">
                     <div className="mt-16 flex flex-col gap-5">
                         <h1 className="text-3xl md:text-4xl">

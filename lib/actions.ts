@@ -16,6 +16,10 @@ import { Database } from "@/types/supabase"
 import { CreateNoteFormSchema } from "@/components/create-note-btn"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
+import {
+    deleteSubjectFormSchema,
+    editSbjectFormSchema,
+} from "@/components/manage-subject"
 import { NotesPlaygroundFormSchema } from "@/components/notes-playground"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { QuizFormSchema } from "@/components/quiz"
@@ -203,6 +207,89 @@ export const createNewSubject = async (
         }
     } finally {
         revalidatePath("/teacher")
+    }
+}
+
+export const editSubject = async (
+    formData: z.infer<typeof editSbjectFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase
+            .from("subjects")
+            .update({
+                subjectname: formData.subjectname,
+                description: formData.subjectdescription,
+            })
+            .eq("subjectid", formData.subjectid)
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully Edited the Subject.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/subject/${formData.subjectid}`)
+    }
+}
+
+export const deleteSubject = async (
+    formData: z.infer<typeof deleteSubjectFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase
+            .from("subjects")
+            .delete()
+            .eq("subjectid", formData.subjectid)
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully Deleted the Subject.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/subject/${formData.subjectid}`)
     }
 }
 

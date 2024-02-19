@@ -14,20 +14,12 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import {
-    ArrowUpDown,
-    BarChart2,
-    ChevronDown,
-    MoreHorizontal,
-    MoreVertical,
-    Trash2,
-} from "lucide-react"
+import { BarChart2, MoreVertical, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -132,11 +124,6 @@ export const columns: ColumnDef<StudentEnrollmentData>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        {/* <DropdownMenuItem
-                      onClick={() => navigator.clipboard.writeText(userid ?? "")}
-                    >
-                      Copy User's ID
-                    </DropdownMenuItem> */}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             <Trash2 className="mr-2 h-4 w-4" /> Delete
