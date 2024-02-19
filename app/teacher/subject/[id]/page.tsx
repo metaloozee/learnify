@@ -1,13 +1,7 @@
 import { Suspense } from "react"
-import { revalidatePath } from "next/cache"
-import { cookies } from "next/headers"
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
-import { FilePlus2 } from "lucide-react"
 
-import { Database } from "@/types/supabase"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CreateNoteButton } from "@/components/create-note-btn"
 import { NotesCard } from "@/components/note-card"
 import { Search } from "@/components/search"
 import { StudentEnrollmentDataTable } from "@/components/student-data-table"
@@ -56,32 +50,6 @@ export default async function TeacherSubjectIndexPage({
         )
         .eq("subjectid", params.id)
 
-    const createNote = async () => {
-        "use server"
-        const supabase = await createServerActionClient<Database>({ cookies })
-
-        try {
-            const { data, error } = await supabase
-                .from("notes")
-                .insert({
-                    notetitle: "Untitled",
-                    notecontent: "Click me in order to edit",
-                    subjectid: subject?.subjectid,
-                    teacherid: subject?.teacherid,
-                })
-                .select()
-                .single()
-
-            if (error) {
-                throw new Error(error.message)
-            }
-        } catch (e: any) {
-            console.error(e)
-        } finally {
-            revalidatePath(`/teacher/subject/${subject?.subjectid}`)
-        }
-    }
-
     return session && userData && subject && studentEnrollment ? (
         <div className="w-full h-full flex flex-col justify-center">
             <Tabs defaultValue="notes">
@@ -102,16 +70,10 @@ export default async function TeacherSubjectIndexPage({
                             and empower your students with engaging educational
                             resources.
                         </p>
-                        <form action={createNote}>
-                            <Button
-                                variant={"default"}
-                                className="max-w-fit shadow-xl"
-                                type="submit"
-                            >
-                                <FilePlus2 className="mr-2 h-4 w-4" /> Create
-                                Note
-                            </Button>
-                        </form>
+                        <CreateNoteButton
+                            id={subject.subjectid}
+                            teacherid={subject.teacherid ?? ""}
+                        />
                     </div>
                     <div className="mt-10 flex flex-col gap-5">
                         <Search placeholder="Search Notes..." />

@@ -13,6 +13,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
+import { CreateNoteFormSchema } from "@/components/create-note-btn"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
 import { NotesPlaygroundFormSchema } from "@/components/notes-playground"
@@ -28,6 +29,48 @@ const openai = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0125",
 })
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
+
+export const createNote = async (
+    formData: z.infer<typeof CreateNoteFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase.from("notes").insert({
+            notetitle: "Untitled",
+            notecontent: "Click me in order to edit",
+            subjectid: formData.subjectId,
+            teacherid: formData.teacherId,
+        })
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully Created a New Note.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/subject/${formData.subjectId}`)
+    }
+}
 
 export const saveNote = async (
     formData: z.infer<typeof NotesPlaygroundFormSchema>
