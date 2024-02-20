@@ -152,13 +152,13 @@ export const NotesPlayground = ({
                                         className="w-full"
                                         type="submit"
                                         variant={"secondary"}
-                                        disabled={form.formState.isLoading}
+                                        disabled={form.formState.isSubmitting}
                                     >
                                         <BookCheck className="mr-2 h-4 w-4" />
                                         Publish
                                     </Button>
                                 )}
-                                {form.formState.isLoading ? (
+                                {form.formState.isSubmitting ? (
                                     <Button className="w-full" disabled>
                                         <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                         Please Wait
@@ -231,7 +231,7 @@ export const NotesPlayground = ({
                                 </FormItem>
                             )}
                         />
-                        {form.formState.isLoading ? (
+                        {form.formState.isSubmitting ? (
                             <Button className="w-full" disabled type="submit">
                                 <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                                 Please Wait
