@@ -24,6 +24,7 @@ import { NotesPlaygroundFormSchema } from "@/components/notes-playground"
 import { onboardFormSchema } from "@/components/onboard-form"
 import { QuizFormSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
+import { deleteEnrollmentSchema } from "@/components/student-data-table"
 
 const pinecone = new Pinecone({
     apiKey: env.PINECONE_API_KEY,
@@ -33,6 +34,46 @@ const openai = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0125",
 })
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
+
+export const deleteEnrollment = async (
+    formData: z.infer<typeof deleteEnrollmentSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase
+            .from("studentenrollment")
+            .delete()
+            .eq("enrollmentid", formData.enrollmentid)
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully Deleted the Enrollment.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath(`/teacher/subject/${formData.subjectid}`)
+    }
+}
 
 export const createNote = async (
     formData: z.infer<typeof CreateNoteFormSchema>

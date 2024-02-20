@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -14,18 +15,24 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import { BarChart2, MoreVertical, Trash2 } from "lucide-react"
+import { Trash2 } from "lucide-react"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 
+import { deleteEnrollment } from "@/lib/actions"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
     Table,
@@ -35,6 +42,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useToast } from "@/components/ui/use-toast"
 
 export type StudentEnrollmentData = {
     enrollmentid: string
@@ -49,6 +57,11 @@ export type StudentEnrollmentData = {
         last_name: string | null
     } | null
 }
+
+export const deleteEnrollmentSchema = z.object({
+    enrollmentid: z.string(),
+    subjectid: z.string(),
+})
 
 export const columns: ColumnDef<StudentEnrollmentData>[] = [
     {
@@ -95,42 +108,72 @@ export const columns: ColumnDef<StudentEnrollmentData>[] = [
         },
     },
     {
-        id: "analytics",
-        header: "Analytics",
-        accessorKey: "users.userid",
-        cell: ({ row }) => {
-            return (
-                <Button asChild variant={"outline"}>
-                    <Link href={"/"}>
-                        <BarChart2 className="mr-2 w-4 h-4" />
-                        View Analytics
-                    </Link>
-                </Button>
-            )
-        },
-    },
-    {
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
-            const userid = row.original.users?.userid
+            const { toast } = useToast()
+            const deleteEnrollmentForm = useForm<
+                z.infer<typeof deleteEnrollmentSchema>
+            >({
+                resolver: zodResolver(deleteEnrollmentSchema),
+                defaultValues: {
+                    enrollmentid: row.original.enrollmentid,
+                    subjectid: row.original.subjectid,
+                },
+            })
+
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreVertical className="h-4 w-4" />
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button variant={"outline"}>
+                            <Trash2 className="text-red-500 h-4 w-4" />
                         </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                            Enrollment
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete your subject and remove your
+                                data from our servers.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <form
+                                className="flex gap-2"
+                                onSubmit={deleteEnrollmentForm.handleSubmit(
+                                    async (data) => {
+                                        await deleteEnrollment(data).then(
+                                            (value: any) => {
+                                                return toast({
+                                                    title: value.title,
+                                                    description:
+                                                        value.description,
+                                                    variant:
+                                                        value.variant ??
+                                                        "default",
+                                                })
+                                            }
+                                        )
+                                    }
+                                )}
+                            >
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    disabled={
+                                        deleteEnrollmentForm.formState
+                                            .isSubmitting
+                                    }
+                                    type="submit"
+                                >
+                                    Continue
+                                </AlertDialogAction>
+                            </form>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             )
         },
     },
