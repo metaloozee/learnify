@@ -13,6 +13,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import * as z from "zod"
 
 import { Database } from "@/types/supabase"
+import { CreateEnrollmentSchema } from "@/components/create-enrollment"
 import { CreateNoteFormSchema } from "@/components/create-note-btn"
 import { subjectFormSchema } from "@/components/create-subject-btn"
 import { ContentSchema } from "@/components/generate-content"
@@ -697,6 +698,46 @@ export const updateUserSettings = async (
         }
     } finally {
         revalidatePath("/account")
+    }
+}
+
+export const createEnrollment = async (
+    formData: z.infer<typeof CreateEnrollmentSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase.from("studentenrollment").insert({
+            userid: formData.userid,
+            subjectid: formData.subjectid,
+        })
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "You have successfully enrolled yourself.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath("/subjects")
     }
 }
 
