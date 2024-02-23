@@ -7,6 +7,7 @@ import { NotesCard } from "@/components/note-card"
 import { Search } from "@/components/search"
 import { StudentEnrollmentDataTable } from "@/components/student-data-table"
 import { SkeletonCard } from "@/components/subject-card"
+import { UploadNotesBtn } from "@/components/upload-notes"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function TeacherSubjectIndexPage({
@@ -78,10 +79,17 @@ export default async function TeacherSubjectIndexPage({
                             and empower your students with engaging educational
                             resources.
                         </p>
-                        <CreateNoteButton
-                            id={subject.subjectid}
-                            teacherid={subject.teacherid ?? ""}
-                        />
+                        <div className="flex gap-5">
+                            <CreateNoteButton
+                                id={subject.subjectid}
+                                teacherid={subject.teacherid ?? ""}
+                            />
+
+                            <UploadNotesBtn
+                                subject={subject}
+                                session={session}
+                            />
+                        </div>
                     </div>
                     <div className="mt-10 flex flex-col gap-5">
                         <Search placeholder="Search Notes..." />

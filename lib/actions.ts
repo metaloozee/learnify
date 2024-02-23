@@ -26,6 +26,7 @@ import { onboardFormSchema } from "@/components/onboard-form"
 import { QuizFormSchema } from "@/components/quiz"
 import { accountSettingsFormSchema } from "@/components/settings-form"
 import { deleteEnrollmentSchema } from "@/components/student-data-table"
+import { UploadNotesFormSchema } from "@/components/upload-notes"
 
 const pinecone = new Pinecone({
     apiKey: env.PINECONE_API_KEY,
@@ -35,6 +36,49 @@ const openai = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0125",
 })
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 })
+
+export const uploadNote = async (
+    formData: z.infer<typeof UploadNotesFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        const { error } = await supabase.from("notes").insert({
+            notetitle: "Uploaded Untitled Note",
+            notecontent: formData.content,
+            subjectid: formData.subjectid,
+            teacherid: formData.teacherid,
+        })
+
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "Successfully created the note.",
+        }
+    } catch (e: any) {
+        console.error(e)
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        // await worker.terminate()
+        revalidatePath(`/teacher/notes/${formData.subjectid}`)
+    }
+}
 
 export const deleteEnrollment = async (
     formData: z.infer<typeof deleteEnrollmentSchema>

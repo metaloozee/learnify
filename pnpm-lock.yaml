@@ -144,8 +144,8 @@ dependencies:
         specifier: ^0.1.18
         version: 0.1.18(@huggingface/inference@2.6.4)(@pinecone-database/pinecone@2.0.1)(@supabase/supabase-js@2.39.2)(@upstash/redis@1.28.3)(encoding@0.1.13)
     lucide-react:
-        specifier: ^0.309.0
-        version: 0.309.0(react@18.2.0)
+        specifier: ^0.338.0
+        version: 0.338.0(react@18.2.0)
     mathjs:
         specifier: ^12.3.1
         version: 12.3.1
@@ -194,6 +194,9 @@ dependencies:
     tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.3.3)
+    tesseract.js:
+        specifier: ^5.0.4
+        version: 5.0.4(encoding@0.1.13)
     typescript:
         specifier: 5.1.3
         version: 5.1.3
@@ -5583,6 +5586,13 @@ packages:
             }
         dev: false
 
+    /bmp-js@0.1.0:
+        resolution:
+            {
+                integrity: sha512-vHdS19CnY3hwiNdkaqk93DvjVLfbEcI8mys4UjuWrlX1haDmroo8o4xCzh4wD6DGV6HxRCyauwhHRqMTfERtjw==,
+            }
+        dev: false
+
     /brace-expansion@1.1.11:
         resolution:
             {
@@ -7616,6 +7626,13 @@ packages:
         dependencies:
             safer-buffer: 2.1.2
 
+    /idb-keyval@6.2.1:
+        resolution:
+            {
+                integrity: sha512-8Sb3veuYCyrZL+VBt9LJfZjLUPWVvqn8tG28VqYNFCo43KHcKuq+b4EiXGeuaLAQWL2YmyDgMp2aSpH9JHsEQg==,
+            }
+        dev: false
+
     /ieee754@1.2.1:
         resolution:
             {
@@ -7784,6 +7801,13 @@ packages:
             }
         dev: false
 
+    /is-electron@2.2.2:
+        resolution:
+            {
+                integrity: sha512-FO/Rhvz5tuw4MCWkpMzHFKWD2LsfHzIb7i6MdPYZ/KW7AlxawyLkqdy+jPZP1WubqEADE3O4FUENlJHDfQASRg==,
+            }
+        dev: false
+
     /is-extendable@1.0.1:
         resolution:
             {
@@ -7907,6 +7931,13 @@ packages:
                 integrity: sha512-knxG2q4UC3u8stRGyAVJCOdxFmv5DZiRcdlIaAQXAbSfJya+OhopNotLQrstBhququ4ZpuKbDc/8S6mgXgPFPw==,
             }
         engines: { node: ">=10" }
+        dev: false
+
+    /is-url@1.2.4:
+        resolution:
+            {
+                integrity: sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==,
+            }
         dev: false
 
     /isexe@2.0.0:
@@ -8639,10 +8670,10 @@ packages:
         dependencies:
             yallist: 4.0.0
 
-    /lucide-react@0.309.0(react@18.2.0):
+    /lucide-react@0.338.0(react@18.2.0):
         resolution:
             {
-                integrity: sha512-zNVPczuwFrCfksZH3zbd1UDE6/WYhYAdbe2k7CImVyPAkXLgIwbs6eXQ4loigqDnUFjyFYCI5jZ1y10Kqal0dg==,
+                integrity: sha512-Uq+vcn/gp6l01GpDH8SxY6eAvO6Ur2bSU39NxEEJt35OotnVCH5q26TZEVPtJf23gTAncXd3DJQqcezIm6HA7w==,
             }
         peerDependencies:
             react: ^16.5.1 || ^17.0.0 || ^18.0.0
@@ -10613,6 +10644,14 @@ packages:
             }
         dev: false
 
+    /opencollective-postinstall@2.0.3:
+        resolution:
+            {
+                integrity: sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==,
+            }
+        hasBin: true
+        dev: false
+
     /optionator@0.9.3:
         resolution:
             {
@@ -11703,6 +11742,13 @@ packages:
             strip-indent: 3.0.0
         dev: false
 
+    /regenerator-runtime@0.13.11:
+        resolution:
+            {
+                integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==,
+            }
+        dev: false
+
     /regenerator-runtime@0.14.1:
         resolution:
             {
@@ -12786,6 +12832,34 @@ packages:
             source-map-support: 0.5.21
         dev: false
 
+    /tesseract.js-core@5.0.0:
+        resolution:
+            {
+                integrity: sha512-lJur5LzjinW5VYMKlVNnBU2JPLpO+A9VqAYBeuV+ZgH0hKvsnm+536Yyp+/zRTBdLe7D6Kok0FN9g+TE4J8qGA==,
+            }
+        dev: false
+
+    /tesseract.js@5.0.4(encoding@0.1.13):
+        resolution:
+            {
+                integrity: sha512-GCIoSQMZlvTP2AaHrjUOH29/oyO7ZyHVe+BhTexEcO7/nDClRVDRjl2sYJLOWSSNbTDrm5q2m1+gfaf3lUrZ5Q==,
+            }
+        requiresBuild: true
+        dependencies:
+            bmp-js: 0.1.0
+            idb-keyval: 6.2.1
+            is-electron: 2.2.2
+            is-url: 1.2.4
+            node-fetch: 2.7.0(encoding@0.1.13)
+            opencollective-postinstall: 2.0.3
+            regenerator-runtime: 0.13.11
+            tesseract.js-core: 5.0.0
+            wasm-feature-detect: 1.6.1
+            zlibjs: 0.3.1
+        transitivePeerDependencies:
+            - encoding
+        dev: false
+
     /text-table@0.2.0:
         resolution:
             {
@@ -13430,6 +13504,13 @@ packages:
             }
         dev: false
 
+    /wasm-feature-detect@1.6.1:
+        resolution:
+            {
+                integrity: sha512-R1i9ED8UlLu/foILNB1ck9XS63vdtqU/tP1MCugVekETp/ySCrBZRk5I/zI67cI1wlQYeSonNm1PLjDHZDNg6g==,
+            }
+        dev: false
+
     /watchpack@2.4.0:
         resolution:
             {
@@ -13712,6 +13793,13 @@ packages:
                 integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==,
             }
         engines: { node: ">=10" }
+        dev: false
+
+    /zlibjs@0.3.1:
+        resolution:
+            {
+                integrity: sha512-+J9RrgTKOmlxFSDHo0pI1xM6BLVUv+o0ZT9ANtCxGkjIVCCUdx9alUF8Gm+dGLKbkkkidWIHFDZHDMpfITt4+w==,
+            }
         dev: false
 
     /zod-to-json-schema@3.22.4(zod@3.22.4):
