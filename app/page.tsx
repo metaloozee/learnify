@@ -193,7 +193,7 @@ export default async function Index() {
                     </div>
                 </div>
             </section>
-            {/* <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg md:rounded-full rounded-xl border p-5">
+            <section className="container w-full min-h-[100px] bg-muted/30 backdrop-blur-lg md:rounded-full rounded-xl border px-5 py-10">
                 <div className="flex flex-col justify-between items-center gap-2 text-center">
                     <h1 className="font-bold text-xl md:text-3xl">
                         Our Project is Open Source!
@@ -207,11 +207,11 @@ export default async function Index() {
                     <Button className="mt-5" asChild>
                         <Link href="https://github.com/metaloozee/learnify">
                             <GitHubLogoIcon className="h-6 w-6 mr-2" />
-                            500 Stars
+                            GitHub
                         </Link>
                     </Button>
                 </div>
-            </section> */}
+            </section>
         </main>
     )
 }

@@ -35,7 +35,7 @@ export default function RootLayout({
                             {children}
                         </div>
                         <Toaster />
-                        <Footer />
+                        {/* <Footer /> */}
                         <Background />
                     </div>
                 </SupabaseProvider>
