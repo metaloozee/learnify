@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { type User } from "@supabase/supabase-js"
 import { UserIcon } from "lucide-react"
 
@@ -31,6 +31,8 @@ export const UserAccount = ({
     children?: React.ReactElement
 }) => {
     const router = useRouter()
+    const pathname = usePathname()
+
     const { supabase: supa } = useSupabase()
 
     const handleLogin = async () => {
@@ -99,7 +101,11 @@ export const UserAccount = ({
         <Button className="shadow-xl max-w-fit group" onClick={handleLogin}>
             {children}
         </Button>
-    ) : (
+    ) : pathname === "/" ? (
         <></>
+    ) : (
+        <Button className="shadow-xl max-w-fit group" onClick={handleLogin}>
+            Login
+        </Button>
     )
 }
