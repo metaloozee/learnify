@@ -1,4 +1,6 @@
+import Image from "next/image"
 import Link from "next/link"
+import Brand from "@/public/_static/brand.svg"
 
 import { UserAccount } from "@/components/account-btn"
 import { createServerSupabaseClient } from "@/app/supabase-server"
@@ -26,7 +28,12 @@ export const Navbar = async () => {
             <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
                 <div className="flex gap-6 md:gap-10">
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="inline-block font-bold">Learnify</span>
+                        <Image
+                            src={Brand}
+                            alt="Learnify"
+                            width={40}
+                            height={40}
+                        />
                     </Link>
                 </div>
 
