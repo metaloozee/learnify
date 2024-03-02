@@ -39,11 +39,19 @@ export const AccountSettingsForm = ({
 }) => {
     const { toast } = useToast()
 
+    const atIndex = session.user.email?.indexOf("@") ?? 0
+    const username = session.user.email?.substring(0, atIndex) ?? ""
+    const hiddenUsername =
+        username.substring(0, Math.ceil(username.length / 2)) +
+        "*".repeat(
+            Math.max(username.length - Math.ceil(username.length / 2), 0)
+        )
+
     const form = useForm<z.infer<typeof accountSettingsFormSchema>>({
         resolver: zodResolver(accountSettingsFormSchema),
         defaultValues: {
             username: user.username,
-            email: session.user.email,
+            email: hiddenUsername + session.user.email?.substring(atIndex),
             first_name: user.first_name as string,
             last_name: user.last_name as string,
             type: (user.usertype as "student" | "teacher") ?? undefined,

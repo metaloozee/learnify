@@ -1,5 +1,6 @@
 import React from "react"
 
+import { DeleteAccountForm } from "@/components/delete-account-form"
 import { AccountSettingsForm } from "@/components/settings-form"
 import { SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
@@ -28,6 +29,9 @@ export default async function Account() {
             </p>
             <React.Suspense fallback={<SkeletonCard />}>
                 <AccountSettingsForm session={session} user={userData} />
+            </React.Suspense>
+            <React.Suspense fallback={<SkeletonCard />}>
+                <DeleteAccountForm session={session} user={userData} />
             </React.Suspense>
         </div>
     ) : (

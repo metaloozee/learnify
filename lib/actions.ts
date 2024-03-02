@@ -16,6 +16,7 @@ import { Database } from "@/types/supabase"
 import { CreateEnrollmentSchema } from "@/components/create-enrollment"
 import { CreateNoteFormSchema } from "@/components/create-note-btn"
 import { subjectFormSchema } from "@/components/create-subject-btn"
+import { deleteAccountFormSchema } from "@/components/delete-account-form"
 import { ContentSchema } from "@/components/generate-content"
 import {
     deleteSubjectFormSchema,
@@ -734,6 +735,56 @@ export const updateUserSettings = async (
             description: "You have successfully updated yourself.",
         }
     } catch (e: any) {
+        return {
+            status: "error",
+            title: "Oops! Something went wrong.",
+            description: e.message,
+            variant: "destructive",
+        }
+    } finally {
+        revalidatePath("/account")
+    }
+}
+
+export const deleteUser = async (
+    formData: z.infer<typeof deleteAccountFormSchema>
+) => {
+    const supabase = await createServerActionClient<Database>({ cookies })
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
+
+    try {
+        if (!session) {
+            throw new Error("UNAUTHORIZED")
+        }
+
+        if (session.user.email !== formData.email) {
+            throw new Error(
+                "The user's email address and the provided email address do not match."
+            )
+        }
+
+        const { error } = await supabase
+            .from("users")
+            .delete()
+            .eq("username", formData.username)
+        if (error) {
+            throw new Error(error.message)
+        }
+
+        const { error: logOutError } = await supabase.auth.signOut()
+        if (logOutError) {
+            throw new Error(logOutError.message)
+        }
+
+        return {
+            status: "ok",
+            title: "Success!",
+            description: "You have successfully deleted your account",
+        }
+    } catch (e: any) {
+        console.error(e)
         return {
             status: "error",
             title: "Oops! Something went wrong.",
