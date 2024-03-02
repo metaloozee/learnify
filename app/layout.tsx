@@ -1,6 +1,7 @@
 import "./globals.css"
 
 import { Lora } from "next/font/google"
+import { Analytics } from "@vercel/analytics/react"
 
 import { Background } from "@/components/ui/background"
 import { Toaster } from "@/components/ui/toaster"
@@ -35,8 +36,8 @@ export default function RootLayout({
                             {children}
                         </div>
                         <Toaster />
-                        {/* <Footer /> */}
                         <Background />
+                        <Analytics />
                     </div>
                 </SupabaseProvider>
             </body>
