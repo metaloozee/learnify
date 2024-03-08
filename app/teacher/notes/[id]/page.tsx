@@ -1,11 +1,18 @@
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
-import Link from "next/link"
-import { redirect } from "next/navigation"
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import { MoreVertical, RotateCcw, Trash2 } from "lucide-react"
 
 import { Database } from "@/types/supabase"
+import {
+    Breadcrumb,
+    BreadcrumbEllipsis,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -50,6 +57,10 @@ export default async function TeacherNotesIndexPage({
         .select("*")
         .eq("noteid", params.id)
         .single()
+    const { data: subjects } = await supabase
+        .from("subjects")
+        .select("subjectname, subjectid")
+        .eq("teacherid", teacherData?.userid ?? "")
     const { data: subjectData } = await supabase
         .from("subjects")
         .select("*")
@@ -100,16 +111,40 @@ export default async function TeacherNotesIndexPage({
     return session && teacherData && noteData && subjectData ? (
         <div className="w-full flex flex-col gap-5">
             <div className="flex flex-row justify-between items-center gap-5">
-                <span className="text-xs text-muted-foreground">
-                    Dashboard &gt;{" "}
-                    <Link href={`/teacher/subject/${subjectData.subjectid}`}>
-                        {subjectData.subjectname}
-                    </Link>{" "}
-                    &gt;{" "}
-                    <Link href={`/teacher/notes/${noteData.noteid}`}>
-                        {noteData.notetitle}
-                    </Link>
-                </span>
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="flex items-center gap-1">
+                                    <BreadcrumbEllipsis className="h-4 w-4" />
+                                    <span className="sr-only">Toggle menu</span>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    {subjects &&
+                                        subjects.map((s, index) => (
+                                            <DropdownMenuItem key={index}>
+                                                <BreadcrumbLink
+                                                    href={`/teacher/subject/${s.subjectid}`}
+                                                >
+                                                    {s.subjectname}
+                                                </BreadcrumbLink>
+                                            </DropdownMenuItem>
+                                        ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>
+                                {noteData.notetitle}
+                            </BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
