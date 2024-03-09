@@ -2,6 +2,7 @@ import "./globals.css"
 
 import { Lora } from "next/font/google"
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import { Background } from "@/components/ui/background"
 import { Toaster } from "@/components/ui/toaster"
@@ -37,7 +38,9 @@ export default function RootLayout({
                         </div>
                         <Toaster />
                         <Background />
+
                         <Analytics />
+                        <SpeedInsights />
                     </div>
                 </SupabaseProvider>
             </body>
