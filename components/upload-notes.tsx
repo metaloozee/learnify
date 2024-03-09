@@ -9,6 +9,8 @@ import { createWorker } from "tesseract.js"
 import * as z from "zod"
 
 import { uploadNote } from "@/lib/actions"
+import { cn } from "@/lib/utils"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -19,6 +21,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
@@ -40,9 +52,74 @@ export const UploadNotesBtn = ({
     subject: Subject
     session: Session
 }) => {
-    const { toast } = useToast()
+    const [open, setOpen] = React.useState(false)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
     const [text, setText] = React.useState<string | null>(null)
+
+    if (isDesktop) {
+        return (
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <Button
+                        variant={"outline"}
+                        className="max-w-fit"
+                        type="submit"
+                    >
+                        <Camera className="mr-2 h-4 w-4" />
+                        Upload Notes
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Taking the easy step?</DialogTitle>
+                        <DialogDescription>
+                            Well... it's actually time saving innit?
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <UploadForm subject={subject} session={session} />
+                </DialogContent>
+            </Dialog>
+        )
+    }
+
+    return (
+        <Drawer open={open} onOpenChange={setOpen}>
+            <DrawerTrigger asChild>
+                <Button variant={"outline"} className="max-w-fit" type="submit">
+                    <Camera className="mr-2 h-4 w-4" />
+                    Upload Notes
+                </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+                <DrawerHeader>
+                    <DrawerTitle>Taking the easy step?</DrawerTitle>
+                    <DrawerDescription>
+                        Well... it's actually time saving innit?
+                    </DrawerDescription>
+                </DrawerHeader>
+
+                <UploadForm
+                    className="p-4"
+                    subject={subject}
+                    session={session}
+                />
+            </DrawerContent>
+        </Drawer>
+    )
+}
+
+const UploadForm = ({
+    subject,
+    session,
+    className,
+}: {
+    subject: Subject
+    session: Session
+    className?: String
+}) => {
+    const { toast } = useToast()
 
     const form = useForm<z.infer<typeof UploadNotesFormSchema>>({
         resolver: zodResolver(UploadNotesFormSchema),
@@ -69,63 +146,41 @@ export const UploadNotesBtn = ({
 
         return form.setValue("content", text)
     }
-
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant={"outline"} className="max-w-fit" type="submit">
-                    <Camera className="mr-2 h-4 w-4" />
-                    Upload Notes
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Taking the easy step?</DialogTitle>
-                    <DialogDescription>
-                        Well... it's actually time saving innit?
-                    </DialogDescription>
-                </DialogHeader>
+        <div className={cn("flex flex-col gap-2", className)}>
+            <Input type="file" accept="image/*" onChange={handleFileUpload} />
 
-                <div className="flex flex-col gap-2">
-                    <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileUpload}
+            <form
+                className="space-y-5"
+                onSubmit={form.handleSubmit(async (data) => {
+                    await uploadNote(data).then((value: any) => {
+                        return toast({
+                            title: value.title,
+                            description: value.description,
+                            variant: value.variant ?? "default",
+                        })
+                    })
+                })}
+            >
+                <DialogDescription>
+                    <Textarea
+                        {...form.register("content")}
+                        onChange={(e) =>
+                            form.setValue("content", e.target.value)
+                        }
+                        disabled
                     />
+                </DialogDescription>
 
-                    <form
-                        className="space-y-5"
-                        onSubmit={form.handleSubmit(async (data) => {
-                            await uploadNote(data).then((value: any) => {
-                                return toast({
-                                    title: value.title,
-                                    description: value.description,
-                                    variant: value.variant ?? "default",
-                                })
-                            })
-                        })}
+                <DialogFooter>
+                    <Button
+                        type="submit"
+                        disabled={form.formState.isSubmitting}
                     >
-                        <DialogDescription>
-                            <Textarea
-                                {...form.register("content")}
-                                onChange={(e) =>
-                                    form.setValue("content", e.target.value)
-                                }
-                                disabled
-                            />
-                        </DialogDescription>
-
-                        <DialogFooter>
-                            <Button
-                                type="submit"
-                                disabled={form.formState.isSubmitting}
-                            >
-                                Create Note
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </div>
-            </DialogContent>
-        </Dialog>
+                        Create Note
+                    </Button>
+                </DialogFooter>
+            </form>
+        </div>
     )
 }
