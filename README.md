@@ -8,9 +8,9 @@
   <a href="#features"><strong>Features</strong></a> ·
   <a href="#getting-started"><strong>Getting Started</strong></a> ·
   <a href="#contributing"><strong>Contributing</strong></a> ·
-  <a href="#code-of-conduct"><strong>Code Of Conduct</strong></a> ·
+  <!-- <a href="#code-of-conduct"><strong>Code Of Conduct</strong></a> · -->
   <a href="#license"><strong>License</strong></a> ·
-  <a href="#acknowledgments"><strong>Acknowledgments</strong></a> ·
+  <!-- <a href="#acknowledgments"><strong>Acknowledgments</strong></a>  -->
 </p>
 
 ## Introduction
