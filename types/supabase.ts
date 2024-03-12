@@ -9,30 +9,6 @@ export type Json =
 export type Database = {
     public: {
         Tables: {
-            analytics: {
-                Row: {
-                    action: string
-                    additionalmetadata: string | null
-                    analyticsid: string
-                    timestamp: string | null
-                    userid: string | null
-                }
-                Insert: {
-                    action: string
-                    additionalmetadata?: string | null
-                    analyticsid?: string
-                    timestamp?: string | null
-                    userid?: string | null
-                }
-                Update: {
-                    action?: string
-                    additionalmetadata?: string | null
-                    analyticsid?: string
-                    timestamp?: string | null
-                    userid?: string | null
-                }
-                Relationships: []
-            }
             generatedcontent: {
                 Row: {
                     contentbody: string
@@ -147,18 +123,18 @@ export type Database = {
                 }
                 Relationships: [
                     {
+                        foreignKeyName: "public_qna_studentid_fkey"
+                        columns: ["studentid"]
+                        isOneToOne: false
+                        referencedRelation: "users"
+                        referencedColumns: ["userid"]
+                    },
+                    {
                         foreignKeyName: "qna_noteid_fkey"
                         columns: ["noteid"]
                         isOneToOne: false
                         referencedRelation: "notes"
                         referencedColumns: ["noteid"]
-                    },
-                    {
-                        foreignKeyName: "qna_studentid_fkey"
-                        columns: ["studentid"]
-                        isOneToOne: false
-                        referencedRelation: "users"
-                        referencedColumns: ["userid"]
                     },
                 ]
             }
