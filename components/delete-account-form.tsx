@@ -52,7 +52,7 @@ export const DeleteAccountForm = ({
             <Accordion type="single" collapsible>
                 <AccordionItem value="item-1" className="border-none">
                     <AccordionTrigger>
-                        <h1 className="text-xl">
+                        <h1 className="text-xl text-left">
                             Delete My Account{" "}
                             <span className="text-muted-foreground">
                                 {" "}
@@ -61,7 +61,9 @@ export const DeleteAccountForm = ({
                         </h1>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <h1 className="text-xl">Are you absolutely sure?</h1>
+                        <h1 className="text-xl text-left">
+                            Are you absolutely sure?
+                        </h1>
                         <p>
                             This action cannot be undone. This will permanently
                             delete all your records including the subjects and
@@ -87,7 +89,7 @@ export const DeleteAccountForm = ({
                                     )
                                     form.reset()
                                 })}
-                                className="mt-10 flex flex-row items-end gap-2"
+                                className="mt-10 flex flex-row  items-end gap-2"
                             >
                                 <FormField
                                     control={form.control}
@@ -99,7 +101,6 @@ export const DeleteAccountForm = ({
                                             </FormLabel>
                                             <FormControl>
                                                 <Input
-                                                    className="w-[500px]"
                                                     placeholder="john.doe@domain.name"
                                                     {...field}
                                                 />
