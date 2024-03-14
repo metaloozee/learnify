@@ -55,7 +55,7 @@ export default async function TeacherSubjectIndexPage({
     return session && userData && subject && studentEnrollment ? (
         <div className="w-full h-full flex flex-col justify-center">
             <Tabs defaultValue="notes">
-                <div className="flex justify-between gap-5">
+                <div className="flex flex-wrap justify-between gap-5">
                     <TabsList>
                         <TabsTrigger className="text-xs" value="notes">
                             Manage Notes
