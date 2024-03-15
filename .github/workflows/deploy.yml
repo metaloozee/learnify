@@ -1,0 +1,46 @@
+name: Build & Deploy
+
+on:
+    push:
+        branches: [main]
+
+env:
+    IMAGE_NAME: "learnify"
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the repo
+              uses: actions/checkout@v2
+
+            - name: Connect to Droplet via SSH action
+              uses: appleboy/ssh-action@v0.1.3
+              with:
+                  host: ${{ secrets.SSH_HOST }}
+                  username: ${{ secrets.SSH_USERNAME }}
+                  password: ${{ secrets.SSH_PASSWORD }}
+                  envs: IMAGE_NAME
+                  script: |
+                      # Check if the repository already exists or not
+                      if [ -d /var/www/learnify/ ]; then
+                        # updates the repository
+                        cd /var/www/learnify
+                        git pull
+
+                        # builds the new image
+                        docker build -t $(echo $IMAGE_NAME) .
+
+                        # stops the running container
+                        docker stop $(echo $IMAGE_NAME)
+
+                        # remove old container
+                        docker rm $(echo $IMAGE_NAME)
+
+                        # run a new container from a new image
+                        docker run -d --name $(echo $IMAGE_NAME) --env-file .env.local -p 3000:3000 $(echo $IMAGE_NAME)
+                      else
+                        cd /var/www
+                        git clone https://github.com/metaloozee/learnify.git
+                        echo "Please set the environment variables using SFTP."
+                      fi
