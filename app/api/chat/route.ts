@@ -9,7 +9,9 @@ import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export const runtime = "edge"
 
-const openai = new ChatOpenAI({})
+const openai = new ChatOpenAI({
+    openAIApiKey: env.OPENAI_API_KEY,
+})
 const pinecone = new Pinecone({
     apiKey: env.PINECONE_API_KEY,
 })
