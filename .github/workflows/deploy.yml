@@ -13,6 +13,12 @@ on:
 env:
     REGISTRY: "registry.digitalocean.com/learnify"
     IMAGE_NAME: "learnify"
+    NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+    UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+    PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
 
 jobs:
     build_and_push:
