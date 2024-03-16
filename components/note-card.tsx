@@ -53,6 +53,7 @@ const getNote = async ({
             .select("*")
             .eq("teacherid", session?.user.id ?? "")
             .eq("subjectid", subjectid)
+            .order("updated_at", { ascending: false })
             .limit(limit)
     }
 
@@ -71,6 +72,7 @@ const getNote = async ({
             .from("notes")
             .select("*")
             .eq("subjectid", subjectid)
+            .order("updated_at", { ascending: false })
             .limit(limit)
     }
 }
