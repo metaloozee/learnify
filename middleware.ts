@@ -23,7 +23,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     if (session && key.length == 0) {
         const { data: userData, error: userError } = await supabase
             .from("users")
-            .select("*")
+            .select("usertype")
             .eq("userid", session?.user.id ?? "")
             .maybeSingle()
 
