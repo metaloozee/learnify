@@ -1,7 +1,7 @@
 import { Suspense } from "react"
-import { PlusSquare } from "lucide-react"
+import Link from "next/link"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
-import { Button } from "@/components/ui/button"
 import { CreateSubjectButton } from "@/components/create-subject-btn"
 import { SkeletonCard, TeacherSubjectCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
@@ -65,6 +65,13 @@ export default async function TeacherIndexPage() {
             <p className="text-md text-muted-foreground">
                 You don't have the necessary privileges to view this page.
             </p>
+            <Link
+                className="text-muted-foreground text-xs flex justify-start items-center"
+                href={"/"}
+            >
+                <ArrowLeftIcon className="mr-2" />
+                back
+            </Link>
         </div>
     )
 }

@@ -1,4 +1,6 @@
 import { Suspense } from "react"
+import Link from "next/link"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateNoteButton } from "@/components/create-note-btn"
@@ -142,6 +144,13 @@ export default async function TeacherSubjectIndexPage({
             <p className="text-md text-muted-foreground">
                 You don't have the necessary privileges to view this page.
             </p>
+            <Link
+                className="text-muted-foreground text-xs flex justify-start items-center"
+                href={"/"}
+            >
+                <ArrowLeftIcon className="mr-2" />
+                back
+            </Link>
         </div>
     )
 }

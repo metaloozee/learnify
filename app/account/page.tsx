@@ -1,4 +1,6 @@
 import React from "react"
+import Link from "next/link"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
 import { DeleteAccountForm } from "@/components/delete-account-form"
 import { AccountSettingsForm } from "@/components/settings-form"
@@ -43,6 +45,13 @@ export default async function Account() {
                 You don't have the necessary privileges to view this page /
                 Kindly register yourself before changing your credentials.
             </p>
+            <Link
+                className="text-muted-foreground text-xs flex justify-start items-center"
+                href={"/"}
+            >
+                <ArrowLeftIcon className="mr-2" />
+                back
+            </Link>
         </div>
     )
 }

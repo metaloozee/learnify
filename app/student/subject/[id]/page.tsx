@@ -1,5 +1,6 @@
 import { Suspense } from "react"
-import { revalidatePath } from "next/cache"
+import Link from "next/link"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
 import { Badge } from "@/components/ui/badge"
 import { NotesCard } from "@/components/note-card"
@@ -70,6 +71,13 @@ export default async function StudentSubjectIndexPage({
             <p className="text-md text-muted-foreground">
                 You don't have the necessary privileges to view this page.
             </p>
+            <Link
+                className="text-muted-foreground text-xs flex justify-start items-center"
+                href={"/"}
+            >
+                <ArrowLeftIcon className="mr-2" />
+                back
+            </Link>
         </div>
     )
 }

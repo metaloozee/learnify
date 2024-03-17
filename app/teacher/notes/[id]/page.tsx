@@ -1,5 +1,7 @@
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
+import Link from "next/link"
+import { ArrowLeftIcon } from "@radix-ui/react-icons"
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import { MoreVertical, RotateCcw, Trash2 } from "lucide-react"
 
@@ -200,6 +202,13 @@ export default async function TeacherNotesIndexPage({
             <p className="text-md text-muted-foreground">
                 You don't have the necessary privileges to view this page.
             </p>
+            <Link
+                className="text-muted-foreground text-xs flex justify-start items-center"
+                href={"/"}
+            >
+                <ArrowLeftIcon className="mr-2" />
+                back
+            </Link>
         </div>
     )
 }
