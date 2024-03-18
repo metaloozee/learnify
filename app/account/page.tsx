@@ -4,7 +4,6 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
 import { DeleteAccountForm } from "@/components/delete-account-form"
 import { AccountSettingsForm } from "@/components/settings-form"
-import { SkeletonCard } from "@/components/subject-card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function Account() {
@@ -29,12 +28,8 @@ export default async function Account() {
                 information. Update your details seamlessly and ensure your
                 learning experience is personalized to your preferences.
             </p>
-            <React.Suspense fallback={<SkeletonCard />}>
-                <AccountSettingsForm session={session} user={userData} />
-            </React.Suspense>
-            <React.Suspense fallback={<SkeletonCard />}>
-                <DeleteAccountForm session={session} user={userData} />
-            </React.Suspense>
+            <AccountSettingsForm session={session} user={userData} />
+            <DeleteAccountForm session={session} user={userData} />
         </div>
     ) : (
         <div className="mt-20 flex flex-col gap-5">
