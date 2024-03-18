@@ -1,8 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { type Session } from "@supabase/supabase-js"
-import { RotateCw } from "lucide-react"
+import { MoveRight, RotateCw } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -80,8 +81,15 @@ export const CreateEnrollment = ({
                     </CardContent>
                 </div>
                 <CardFooter>
-                    <Button className="w-full" disabled>
-                        Already Enrolled
+                    <Button
+                        variant={"outline"}
+                        className="w-full group"
+                        asChild
+                    >
+                        <Link href={`/student/subject/${subject.subjectid}`}>
+                            Start Exploring
+                            <MoveRight className="group-hover:translate-x-2 ml-2 w-4 h-4 transition-all duration-200" />
+                        </Link>
                     </Button>
                 </CardFooter>
             </Card>
