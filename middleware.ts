@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
 
     const ratelimit = new Ratelimit({
         redis: Redis.fromEnv(),
-        limiter: Ratelimit.fixedWindow(5, "2 s"),
+        limiter: Ratelimit.slidingWindow(10, "2 s"),
     })
 
     const {
