@@ -1,11 +1,9 @@
-import { Suspense } from "react"
 import Link from "next/link"
 import { ArrowLeftIcon, SymbolIcon } from "@radix-ui/react-icons"
 import { Bot, CookingPot } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AiChatPlayground } from "@/components/ai-playground"
 import { FlashCard } from "@/components/flashcard"
@@ -97,16 +95,7 @@ export default async function StudentNotesIndexPage({
                 </TabsList>
                 <TabsContent value="note">
                     {notes ? (
-                        <Suspense
-                            fallback={
-                                <div className="mt-5 flex flex-col gap-5 ">
-                                    <Skeleton className="h-10 w-[800px]" />
-                                    <Skeleton className="h-4 w-[600px]" />
-                                    <Skeleton className="h-4 w-[550px]" />
-                                    <Skeleton className="h-4 w-[300px]" />
-                                </div>
-                            }
-                        >
+                        <>
                             <ScrollArea className="mt-5 h-[432px]  rounded-xl px-4 py-2 border">
                                 <CustomMDX source={notes.contentbody} />
                             </ScrollArea>
@@ -122,7 +111,7 @@ export default async function StudentNotesIndexPage({
                                     <SymbolIcon className="ml-2" />
                                 </GenerateContentButton>
                             </div>
-                        </Suspense>
+                        </>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
                             <h1 className="text-3xl md:text-4xl">
@@ -149,16 +138,7 @@ export default async function StudentNotesIndexPage({
                 </TabsContent>
                 <TabsContent value="flash_cards">
                     {flashCards ? (
-                        <Suspense
-                            fallback={
-                                <div className="mt-5 flex flex-col gap-5 ">
-                                    <Skeleton className="h-10 w-[800px]" />
-                                    <Skeleton className="h-4 w-[600px]" />
-                                    <Skeleton className="h-4 w-[550px]" />
-                                    <Skeleton className="h-4 w-[300px]" />
-                                </div>
-                            }
-                        >
+                        <>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-5">
                                 {JSON.parse(flashCards.contentbody).map(
                                     (flashcard: any) => (
@@ -182,7 +162,7 @@ export default async function StudentNotesIndexPage({
                                     <SymbolIcon className="ml-2" />
                                 </GenerateContentButton>
                             </div>
-                        </Suspense>
+                        </>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
                             <h1 className="text-3xl md:text-4xl">
@@ -209,16 +189,7 @@ export default async function StudentNotesIndexPage({
                 </TabsContent>
                 <TabsContent value="mini_quiz">
                     {quiz && quiz.length > 0 ? (
-                        <Suspense
-                            fallback={
-                                <div className="mt-5 flex flex-col gap-5 ">
-                                    <Skeleton className="h-10 w-[800px]" />
-                                    <Skeleton className="h-4 w-[600px]" />
-                                    <Skeleton className="h-4 w-[550px]" />
-                                    <Skeleton className="h-4 w-[300px]" />
-                                </div>
-                            }
-                        >
+                        <>
                             <div className="w-full mt-5 grid grid-cols-1 md:grid-cols-2 gap-5">
                                 {quiz.map(
                                     (q: (typeof quiz)[0], index: number) => (
@@ -238,7 +209,7 @@ export default async function StudentNotesIndexPage({
                                     <SymbolIcon className="ml-2" />
                                 </GenerateContentButton>
                             </div>
-                        </Suspense>
+                        </>
                     ) : (
                         <div className="mt-5 flex flex-col gap-5">
                             <h1 className="text-3xl md:text-4xl">

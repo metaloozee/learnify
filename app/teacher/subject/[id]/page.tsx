@@ -1,4 +1,3 @@
-import { Suspense } from "react"
 import Link from "next/link"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
@@ -8,7 +7,6 @@ import { ManageSubject } from "@/components/manage-subject"
 import { NotesCard } from "@/components/note-card"
 import { Search } from "@/components/search"
 import { StudentEnrollmentDataTable } from "@/components/student-data-table"
-import { SkeletonCard } from "@/components/subject-card"
 import { UploadNotesBtn } from "@/components/upload-notes"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
@@ -99,21 +97,11 @@ export default async function TeacherSubjectIndexPage({
                         <Search placeholder="Search Notes..." />
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10">
-                            <Suspense
-                                key={query}
-                                fallback={
-                                    <>
-                                        <SkeletonCard />
-                                        <SkeletonCard />
-                                    </>
-                                }
-                            >
-                                <NotesCard
-                                    q={query}
-                                    type="teacher"
-                                    subjectid={subject.subjectid}
-                                />
-                            </Suspense>
+                            <NotesCard
+                                q={query}
+                                type="teacher"
+                                subjectid={subject.subjectid}
+                            />
                         </div>
                     </div>
                 </TabsContent>
