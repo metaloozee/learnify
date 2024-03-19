@@ -75,7 +75,7 @@ export default async function StudentAnalyticsIndexPage({
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                            <BreadcrumbPage>Student Analytics</BreadcrumbPage>
+                            <BreadcrumbPage>Student Management</BreadcrumbPage>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -83,9 +83,9 @@ export default async function StudentAnalyticsIndexPage({
                 <div className="mt-10">
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl md:text-4xl">
-                            {studentData.first_name}
+                            Manage{" "}
                             <span className="text-muted-foreground">
-                                's Student Analytics
+                                {studentData.first_name}!
                             </span>
                         </h1>
 
@@ -99,6 +99,14 @@ export default async function StudentAnalyticsIndexPage({
                             </Badge>
                         </div>
                     </div>
+                    <p className="mt-5 text-md text-muted-foreground">
+                        Explore detailed insights into each student's progress
+                        and performance by clicking on their name below. Dive
+                        into the wealth of generated content and quiz
+                        evaluations tailored to their learning journey,
+                        providing valuable feedback and guidance to enhance
+                        their academic experience.
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10 mt-20">
                         {notes?.map((note, index) => (
                             <Link
