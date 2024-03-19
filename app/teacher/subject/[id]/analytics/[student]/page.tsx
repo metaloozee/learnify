@@ -1,25 +1,16 @@
 import Link from "next/link"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
+import { Badge } from "@/components/ui/badge"
 import {
     Breadcrumb,
-    BreadcrumbEllipsis,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { createServerSupabaseClient } from "@/app/supabase-server"
 
 export default async function StudentAnalyticsIndexPage({
@@ -49,6 +40,21 @@ export default async function StudentAnalyticsIndexPage({
         .eq("subjectid", params.id)
         .eq("userid", studentData?.userid ?? "")
         .maybeSingle()
+    const { data: notes } = await supabase
+        .from("notes")
+        .select("noteid, notetitle")
+        .eq("is_published", true)
+        .eq("subjectid", params.id)
+        .eq("teacherid", session?.user.id ?? "")
+
+    const { count: generatedContentCount } = await supabase
+        .from("generatedcontent")
+        .select("contentbody, contentid", { count: "exact", head: true })
+        .eq("studentid", studentData?.userid ?? "")
+    const { count: generatedQuizzesCount } = await supabase
+        .from("qna")
+        .select("*", { count: "exact", head: true })
+        .eq("studentid", studentData?.userid ?? "")
 
     return session && enrollmentData && subjectData && studentData ? (
         <div className="w-full flex flex-col gap-5">
@@ -74,12 +80,42 @@ export default async function StudentAnalyticsIndexPage({
                 </Breadcrumb>
 
                 <div className="mt-10">
-                    <h1 className="text-3xl md:text-4xl">
-                        {studentData.first_name}
-                        <span className="text-muted-foreground">
-                            's Student Analytics
-                        </span>
-                    </h1>
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-3xl md:text-4xl">
+                            {studentData.first_name}
+                            <span className="text-muted-foreground">
+                                's Student Analytics
+                            </span>
+                        </h1>
+
+                        <div className="flex flex-wrap gap-2 max-h-fit">
+                            <Badge variant={"outline"} className="max-w-fit">
+                                Personalized Contents Generated:{" "}
+                                {generatedContentCount}
+                            </Badge>
+                            <Badge variant={"outline"} className="max-w-fit">
+                                Mini Quizzes Generated: {generatedQuizzesCount}
+                            </Badge>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-10 mt-20">
+                        {notes?.map((note, index) => (
+                            <Link
+                                key={index}
+                                className="hover:-translate-y-1 transition-all duration-200"
+                                href={`/`}
+                            >
+                                <Card className="h-full w-full">
+                                    <CardHeader className="pb-0" />
+                                    <CardContent>
+                                        <h1 className="text-2xl font-bold">
+                                            {note.notetitle}
+                                        </h1>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
