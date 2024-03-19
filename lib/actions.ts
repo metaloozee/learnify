@@ -390,7 +390,7 @@ export const evaluateQuizAnswer = async (
     } = await supabase.auth.getSession()
     const { data: quizData } = await supabase
         .from("qna")
-        .select("id, notes(noteid, notecontent)")
+        .select("id, tries, notes(noteid, notecontent)")
         .eq("id", formData.id)
         .single()
 
@@ -401,6 +401,16 @@ export const evaluateQuizAnswer = async (
 
         if (!quizData) {
             throw new Error("Invalid quiz")
+        }
+
+        const { error } = await supabase
+            .from("qna")
+            .update({
+                tries: quizData.tries + 1,
+            })
+            .eq("id", quizData.id)
+        if (error) {
+            throw new Error(error.message)
         }
 
         const q_embedding = await new OpenAIEmbeddings().embedQuery(
