@@ -15,7 +15,7 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import { Trash2 } from "lucide-react"
+import { ExternalLink, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -123,57 +123,68 @@ export const columns: ColumnDef<StudentEnrollmentData>[] = [
             })
 
             return (
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant={"outline"}>
-                            <Trash2 className="text-red-500 h-4 w-4" />
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your subject and remove your
-                                data from our servers.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <form
-                                className="flex gap-2"
-                                onSubmit={deleteEnrollmentForm.handleSubmit(
-                                    async (data) => {
-                                        await deleteEnrollment(data).then(
-                                            (value: any) => {
-                                                return toast({
-                                                    title: value.title,
-                                                    description:
-                                                        value.description,
-                                                    variant:
-                                                        value.variant ??
-                                                        "default",
-                                                })
-                                            }
-                                        )
-                                    }
-                                )}
-                            >
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    disabled={
-                                        deleteEnrollmentForm.formState
-                                            .isSubmitting
-                                    }
-                                    type="submit"
+                <div className="space-x-4">
+                    <Button asChild>
+                        <Link
+                            href={`/teacher/subject/${row.original.subjectid}/${row.original.users?.username}`}
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                        </Link>
+                    </Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant={"outline"}>
+                                <Trash2 className="text-red-500 h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will
+                                    permanently delete your subject and remove
+                                    your data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <form
+                                    className="flex gap-2"
+                                    onSubmit={deleteEnrollmentForm.handleSubmit(
+                                        async (data) => {
+                                            await deleteEnrollment(data).then(
+                                                (value: any) => {
+                                                    return toast({
+                                                        title: value.title,
+                                                        description:
+                                                            value.description,
+                                                        variant:
+                                                            value.variant ??
+                                                            "default",
+                                                    })
+                                                }
+                                            )
+                                        }
+                                    )}
                                 >
-                                    Continue
-                                </AlertDialogAction>
-                            </form>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        disabled={
+                                            deleteEnrollmentForm.formState
+                                                .isSubmitting
+                                        }
+                                        type="submit"
+                                    >
+                                        Continue
+                                    </AlertDialogAction>
+                                </form>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
             )
         },
     },

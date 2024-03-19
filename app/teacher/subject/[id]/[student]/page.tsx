@@ -46,6 +46,7 @@ export default async function StudentAnalyticsIndexPage({
         .eq("is_published", true)
         .eq("subjectid", params.id)
         .eq("teacherid", session?.user.id ?? "")
+        .order("updated_at", { ascending: false })
 
     const { count: generatedContentCount } = await supabase
         .from("generatedcontent")
@@ -103,7 +104,7 @@ export default async function StudentAnalyticsIndexPage({
                             <Link
                                 key={index}
                                 className="hover:-translate-y-1 transition-all duration-200"
-                                href={`/`}
+                                href={`/teacher/subject/${params.id}/${params.student}/${note.noteid}`}
                             >
                                 <Card className="h-full w-full">
                                     <CardHeader className="pb-0" />
