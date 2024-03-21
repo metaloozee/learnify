@@ -99,7 +99,7 @@ export type Database = {
             qna: {
                 Row: {
                     answer: string
-                    graded: boolean | null
+                    graded: boolean
                     id: string
                     noteid: string
                     question: string
@@ -108,7 +108,7 @@ export type Database = {
                 }
                 Insert: {
                     answer: string
-                    graded?: boolean | null
+                    graded?: boolean
                     id?: string
                     noteid: string
                     question: string
@@ -117,7 +117,7 @@ export type Database = {
                 }
                 Update: {
                     answer?: string
-                    graded?: boolean | null
+                    graded?: boolean
                     id?: string
                     noteid?: string
                     question?: string

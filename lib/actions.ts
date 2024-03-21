@@ -493,6 +493,16 @@ export const generatePersonalizedMiniQuiz = async (
             throw new Error("UNAUTHORIZED")
         }
 
+        const { error } = await supabase
+            .from("qna")
+            .delete()
+            .eq("noteid", formData.noteid)
+            .eq("studentid", formData.studentid)
+            .eq("graded", false)
+        if (error) {
+            throw new Error(error.message)
+        }
+
         const messages = [
             new SystemMessage(`
             You are a Personal AI tutor and your student learns better using mini-quiz.

@@ -58,7 +58,7 @@ export default async function StudentNotesIndexPage({
         .select("*")
         .eq("noteid", noteData?.noteid ?? "")
         .eq("studentid", studentData?.userid ?? "")
-        .order("graded", { nullsFirst: true })
+        .order("graded", { ascending: true })
 
     return session && studentData && noteData && subjectData ? (
         <div className="w-full h-full flex flex-col justify-center">
